@@ -1,0 +1,60 @@
+<view class="home-page">
+  <swiper
+    wx:if="{{home.heroBanners.length > 0}}"
+    class="hero-swiper"
+    indicator-dots
+    autoplay
+    circular
+    touchable
+    interval="4200"
+    duration="600"
+  >
+    <swiper-item wx:for="{{home.heroBanners}}" wx:key="imageUrl">
+      <view class="hero-slide">
+        <image class="hero-image" src="{{item.imageUrl}}" mode="aspectFill" />
+        <view class="hero-mask"></view>
+        <view class="hero-logo">TRIPBOND</view>
+        <view class="hero-copy">
+          <view wx:if="{{item.tag}}" class="hero-tag">{{item.tag}}</view>
+          <view class="hero-name">{{item.title}}</view>
+          <view class="hero-desc">{{item.description}}</view>
+        </view>
+        <view class="hero-button" data-id="{{item.productId}}" catchtap="goDetail">立即预定</view>
+      </view>
+    </swiper-item>
+  </swiper>
+
+  <view wx:if="{{loading && home.heroBanners.length === 0}}" class="empty hero-empty">首页内容加载中...</view>
+
+  <view class="quick-row" wx:if="{{home.quickCategories.length > 0}}">
+    <view wx:for="{{home.quickCategories}}" wx:key="key" class="quick-item">
+      <view class="quick-icon">{{index + 1}}</view>
+      <view>{{item.label}}</view>
+    </view>
+  </view>
+
+  <view class="section-band">
+    <view class="section-title">{{home.sectionTitle}}</view>
+    <view class="section-subtitle">{{home.sectionSubtitle}}</view>
+  </view>
+
+  <view wx:if="{{loading && products.length === 0}}" class="empty">正在整理产品...</view>
+  <view wx:elif="{{products.length === 0}}" class="empty">暂无上架产品</view>
+
+  <view class="camp-list">
+    <view wx:for="{{products}}" wx:key="id" class="camp-card" data-id="{{item.id}}" bindtap="goDetail">
+      <image class="camp-image" data-id="{{item.id}}" src="{{item.coverDisplayUrl}}" mode="aspectFill" />
+      <view class="camp-shade" data-id="{{item.id}}"></view>
+      <view class="camp-copy" data-id="{{item.id}}">
+        <view wx:if="{{item.tag}}" class="camp-tag" data-id="{{item.id}}">{{item.tag}}</view>
+        <view class="camp-title" data-id="{{item.id}}">{{item.title}}</view>
+        <view class="camp-desc" data-id="{{item.id}}">{{item.shortDescription || item.summary || '探索适合你的下一段旅程'}}</view>
+      </view>
+      <view class="camp-action" data-id="{{item.id}}" catchtap="goDetail">了解详情</view>
+      <view class="camp-price" data-id="{{item.id}}">{{item.priceText}}</view>
+      <view class="camp-sales" data-id="{{item.id}}">已售 {{item.salesCount || 0}}</view>
+    </view>
+  </view>
+
+  <view class="bottom-spacer"></view>
+</view>

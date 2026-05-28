@@ -1,0 +1,55 @@
+<view class="detail-page">
+  <swiper class="swiper" indicator-dots autoplay circular>
+    <swiper-item wx:for="{{images}}" wx:key="*this">
+      <image class="swiper-image" src="{{item}}" mode="aspectFill" />
+    </swiper-item>
+  </swiper>
+
+  <view wx:if="{{product}}" class="content">
+    <view class="title-row">
+      <view class="title">{{product.title}}</view>
+      <view wx:if="{{product.tag}}" class="tag">{{product.tag}}</view>
+    </view>
+    <view wx:if="{{product.summary || product.shortDescription}}" class="summary">
+      {{product.summary || product.shortDescription}}
+    </view>
+    <view class="meta">
+      <view class="price">{{product.priceText}}</view>
+      <view class="sales">已售 {{product.salesCount}}</view>
+    </view>
+
+    <view wx:if="{{detailImages.length > 0}}" class="detail-images-section">
+      <view class="section-title">产品详情</view>
+      <image
+        wx:for="{{detailImages}}"
+        wx:key="*this"
+        class="detail-image"
+        src="{{item}}"
+        mode="widthFix"
+        show-menu-by-longpress
+      />
+    </view>
+
+    <view class="section">
+      <view class="section-title">行程介绍</view>
+      <text class="section-text">{{product.itinerary}}</text>
+    </view>
+    <view class="section">
+      <view class="section-title">费用说明</view>
+      <text class="section-text">{{product.feeDescription}}</text>
+    </view>
+    <view class="section">
+      <view class="section-title">出行须知</view>
+      <text class="section-text">{{product.travelNotice}}</text>
+    </view>
+    <view wx:if="{{product.refundPolicy}}" class="section">
+      <view class="section-title">退款/改期说明</view>
+      <text class="section-text">{{product.refundPolicy}}</text>
+    </view>
+  </view>
+
+  <view class="bottom-bar">
+    <button class="ghost-button action" bindtap="callService">咨询</button>
+    <button class="primary-button action" bindtap="reserve">立即预订</button>
+  </view>
+</view>

@@ -1,0 +1,77 @@
+<view class="profile-page">
+  <view class="member-hero">
+    <view class="hero-sun"></view>
+    <view class="hero-ridge hero-ridge-back"></view>
+    <view class="hero-ridge hero-ridge-front"></view>
+    <view class="hero-mask"></view>
+    <view class="member-content">
+      <view class="avatar-wrap" bindtap="handleLoginTap">
+        <image wx:if="{{avatarUrl}}" class="avatar-img" src="{{avatarUrl}}" mode="aspectFill"></image>
+        <view wx:else class="avatar-placeholder">{{avatarText}}</view>
+      </view>
+      <view class="member-info" bindtap="handleLoginTap">
+        <view class="member-name">{{isLoggedIn ? nickname : '点击显示微信头像'}}</view>
+        <view class="member-desc">{{isLoggedIn ? '旅邦旅游会员' : '登录后查看订单和专属优惠'}}</view>
+      </view>
+      <view class="member-code" bindtap="showComingSoon">
+        <view class="code-icon">▦</view>
+        <view class="code-text">会员码</view>
+      </view>
+    </view>
+  </view>
+
+  <view class="login-strip">
+    <view class="login-copy">{{isLoggedIn ? '订单管理更轻松，优惠信息不错过' : '登录手机号，订单管理更轻松，优惠信息不错过'}}</view>
+    <button wx:if="{{!isLoggedIn}}" class="login-button" loading="{{loginLoading}}" bindtap="wechatLogin">登录</button>
+    <button wx:else class="logout-button" bindtap="logout">退出</button>
+  </view>
+
+  <view class="coupon-row" bindtap="showComingSoon">
+    <view class="row-left">
+      <view class="row-icon">券</view>
+      <view class="row-title">优惠券/码</view>
+    </view>
+    <view class="row-right">
+      <text>0</text>
+      <text class="chevron">›</text>
+    </view>
+  </view>
+
+  <view class="share-banner" bindtap="showComingSoon">
+    <view class="share-sun"></view>
+    <view class="share-wave share-wave-back"></view>
+    <view class="share-wave share-wave-front"></view>
+    <view class="share-mask"></view>
+    <view class="share-title">“旅”友分享会</view>
+  </view>
+
+  <view class="order-card">
+    <view class="card-head">
+      <view class="card-title">我的订单</view>
+      <view class="card-link" bindtap="showComingSoon">查看全部订单 ›</view>
+    </view>
+    <view class="order-grid">
+      <view class="order-item" wx:for="{{orderItems}}" wx:key="key" bindtap="showComingSoon">
+        <view class="order-icon">{{item.icon}}</view>
+        <view class="order-label">{{item.label}}</view>
+      </view>
+    </view>
+  </view>
+
+  <view class="menu-list">
+    <view class="menu-row" bindtap="showComingSoon">
+      <view class="row-left">
+        <view class="row-icon">约</view>
+        <view class="row-title">我的预约单</view>
+      </view>
+      <view class="chevron">›</view>
+    </view>
+    <view class="menu-row" bindtap="showComingSoon">
+      <view class="row-left">
+        <view class="row-icon">卡</view>
+        <view class="row-title">计次卡</view>
+      </view>
+      <view class="chevron">›</view>
+    </view>
+  </view>
+</view>
