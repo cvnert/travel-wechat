@@ -5,7 +5,11 @@
     <view class="hero-ridge hero-ridge-front"></view>
     <view class="hero-mask"></view>
     <view class="member-content">
-      <view class="avatar-wrap" bindtap="handleLoginTap">
+      <button wx:if="{{isLoggedIn}}" class="avatar-wrap avatar-button" open-type="chooseAvatar" bindchooseavatar="onChooseAvatar" loading="{{profileLoading}}">
+        <image wx:if="{{avatarUrl}}" class="avatar-img" src="{{avatarUrl}}" mode="aspectFill"></image>
+        <view wx:else class="avatar-placeholder">{{avatarText}}</view>
+      </button>
+      <view wx:else class="avatar-wrap" bindtap="handleLoginTap">
         <image wx:if="{{avatarUrl}}" class="avatar-img" src="{{avatarUrl}}" mode="aspectFill"></image>
         <view wx:else class="avatar-placeholder">{{avatarText}}</view>
       </view>

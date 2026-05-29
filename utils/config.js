@@ -1,7 +1,7 @@
 const app = getApp()
 
 function getApiBaseUrl() {
-  return app.globalData.apiBaseUrl || 'http://101.35.131.94:8080'
+  return app.globalData.apiBaseUrl || 'http://cvnert.com.cn:8080'
 }
 
 module.exports = {

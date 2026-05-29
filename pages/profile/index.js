@@ -83,6 +83,34 @@ Page({
       })
   },
 
+  onChooseAvatar(event) {
+    if (!this.data.isLoggedIn) {
+      wx.showToast({ title: '请先登录', icon: 'none' })
+      return
+    }
+    const avatarUrl = event.detail && event.detail.avatarUrl
+    if (!avatarUrl) return
+    this.saveWechatProfile({ avatarUrl }, '头像已更新')
+  },
+
+  saveWechatProfile(profile, successTitle) {
+    if (this.data.profileLoading) return Promise.resolve()
+    this.setData({ profileLoading: true })
+    return api.updateWechatProfile(profile)
+      .then((result) => {
+        console.log('wechat profile response', result)
+        wx.setStorageSync('user', result.user)
+        this.refreshUser()
+        wx.showToast({ title: successTitle, icon: 'success' })
+      })
+      .catch((error) => {
+        wx.showToast({ title: error.error || '头像授权失败', icon: 'none' })
+      })
+      .finally(() => {
+        this.setData({ profileLoading: false })
+      })
+  },
+
   getWechatUserProfile() {
     return new Promise((resolve, reject) => {
       wx.getUserProfile({
