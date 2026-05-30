@@ -1,4 +1,4 @@
-const api = require('../../utils/api')
+const api = require('../../utils/api.js')
 
 const USER_PROFILE_DESC = '用于完善旅邦旅游会员资料'
 

@@ -1,0 +1,84 @@
+<view class="cart-page">
+  <view wx:if="{{showLoadingState}}" class="empty-card">正在加载购物车...</view>
+
+  <view wx:elif="{{showEmptyState}}" class="empty-card empty-card-large">
+    <view class="empty-title">购物车还是空的</view>
+    <view class="empty-desc">先去挑几条喜欢的旅行线路，支付后会自动生成待出行订单和出行凭证。</view>
+    <button class="primary-button empty-button" bindtap="goHome">去逛逛</button>
+  </view>
+
+  <view wx:if="{{showCartList}}" class="cart-list">
+    <view wx:for="{{cartItems}}" wx:key="id" class="cart-card">
+      <view class="card-select">
+        <view class="{{item.checkClass}}" data-id="{{item.id}}" bindtap="toggleSelect">
+          <view wx:if="{{item.showCheckDot}}" class="cart-check-dot"></view>
+        </view>
+      </view>
+      <view class="media-shell">
+        <image class="cover" src="{{item.product.coverDisplayUrl}}" mode="aspectFill" />
+        <view class="cover-badge">{{item.product.badgeText}}</view>
+      </view>
+      <view class="card-body">
+        <view class="card-top">
+          <view class="title-block">
+            <view class="title">{{item.product.title}}</view>
+          </view>
+          <view class="delete-link" data-id="{{item.id}}" bindtap="removeItem">删除</view>
+        </view>
+        <view class="feature-row">
+          <view class="feature-chip feature-chip-primary">{{item.product.bookingText}}</view>
+          <view class="feature-chip">{{item.product.serviceText}}</view>
+        </view>
+        <view class="secure-row">
+          <view class="secure-badge">保</view>
+          <view class="secure-text">{{item.product.guaranteeText}}</view>
+        </view>
+        <view class="card-footer">
+          <view class="price-group">
+            <view class="price">{{item.product.priceText}}</view>
+            <view class="unit-text">{{item.quantityText}}</view>
+          </view>
+          <view class="stepper-shell">
+            <view class="stepper">
+              <view class="step-button" data-id="{{item.id}}" data-delta="-1" bindtap="changeQuantity">-</view>
+              <view class="count">{{item.quantity}}</view>
+              <view class="step-button" data-id="{{item.id}}" data-delta="1" bindtap="changeQuantity">+</view>
+            </view>
+          </view>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <view wx:if="{{showRecommendations}}" class="recommend-section">
+    <view class="recommend-head">
+      <view class="recommend-line"></view>
+      <view class="recommend-title">推荐商品</view>
+      <view class="recommend-line"></view>
+    </view>
+    <view class="{{recommendGridClass}}">
+      <view wx:for="{{recommendProducts}}" wx:key="id" class="recommend-card" data-id="{{item.id}}" bindtap="goDetail">
+        <image class="recommend-image" src="{{item.coverDisplayUrl}}" mode="aspectFill" />
+        <view class="recommend-body">
+          <view class="recommend-name">{{item.title}}</view>
+          <view class="recommend-price">{{item.priceText}}</view>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <view wx:if="{{showCheckoutBar}}" class="checkout-bar">
+    <view class="select-all" bindtap="toggleSelectAll">
+      <view class="{{allSelectedCheckClass}}">
+        <view wx:if="{{showAllSelectedDot}}" class="cart-check-dot"></view>
+      </view>
+      <view class="select-all-text">全选</view>
+    </view>
+    <view class="checkout-info">
+      <view class="checkout-label">已选 {{selectedQuantity}} 件</view>
+      <view class="checkout-price">{{selectedAmountText}}</view>
+      <view class="checkout-note">支付成功后立即生成出行凭证</view>
+    </view>
+    <button class="checkout-button" disabled="{{checkoutDisabled}}" loading="{{paying}}" bindtap="checkout">去结算</button>
+  </view>
+</view>

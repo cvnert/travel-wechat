@@ -1,6 +1,24 @@
-const api = require('../../utils/api')
+const api = require('../../utils/api.js')
 
-const USER_PROFILE_DESC = '用于完善旅邦旅游会员资料'
+const USER_PROFILE_DESC = '用于完善旅行会员资料'
+
+function buildProfileViewState(token, user) {
+  const isLoggedIn = Boolean(token)
+  const nickname = user.nickname || user.username || '微信用户'
+  const avatarUrl = user.avatarUrl || user.avatarURL || ''
+
+  return {
+    isLoggedIn,
+    nickname,
+    avatarUrl,
+    avatarText: nickname.slice(0, 1) || '旅',
+    memberNameText: isLoggedIn ? nickname : '点击登录查看订单',
+    memberDescText: isLoggedIn ? '旅行会员中心' : '登录后同步头像、购物车和订单',
+    loginCopyText: isLoggedIn ? '订单、凭证和出行状态都可以在这里统一查看' : '登录后可加入购物车、支付并查询订单',
+    showLoginButton: !isLoggedIn,
+    showLogoutButton: isLoggedIn
+  }
+}
 
 Page({
   data: {
@@ -8,14 +26,19 @@ Page({
     nickname: '',
     avatarUrl: '',
     avatarText: '旅',
+    memberNameText: '点击登录查看订单',
+    memberDescText: '登录后同步头像、购物车和订单',
+    loginCopyText: '登录后可加入购物车、支付并查询订单',
+    showLoginButton: true,
+    showLogoutButton: false,
     loginLoading: false,
     profileLoading: false,
     orderItems: [
-      { key: 'pay', icon: '￥', label: '待付款' },
-      { key: 'ship', icon: '车', label: '待出行' },
-      { key: 'receive', icon: '票', label: '待确认' },
-      { key: 'comment', icon: '评', label: '待评价' },
-      { key: 'refund', icon: '退', label: '退款/售后' }
+      { key: 'pay', icon: '付', label: '待支付' },
+      { key: 'travel', icon: '行', label: '待出行' },
+      { key: 'done', icon: '旅', label: '已出行' },
+      { key: 'all', icon: '单', label: '全部订单' },
+      { key: 'cart', icon: '车', label: '购物车' }
     ]
   },
 
@@ -26,22 +49,13 @@ Page({
   refreshUser() {
     const token = wx.getStorageSync('token')
     const user = wx.getStorageSync('user') || {}
-    const nickname = user.nickname || user.username || '微信用户'
-    const avatarUrl = user.avatarUrl || user.avatarURL || ''
-    this.setData({
-      isLoggedIn: Boolean(token),
-      nickname,
-      avatarUrl,
-      avatarText: nickname.slice(0, 1) || '旅'
-    })
+    this.setData(buildProfileViewState(token, user))
   },
 
   handleLoginTap() {
     if (!this.data.isLoggedIn) {
       wx.showToast({ title: '请先登录', icon: 'none' })
-      return
     }
-    this.updateWechatProfile()
   },
 
   wechatLogin() {
@@ -50,7 +64,6 @@ Page({
     this.getWechatLoginCode()
       .then(async (code) => {
         const result = await api.wechatLogin(code)
-        console.log('wechat login response', result)
         wx.setStorageSync('token', result.token)
         wx.setStorageSync('user', result.user)
         this.refreshUser()
@@ -61,25 +74,6 @@ Page({
       })
       .finally(() => {
         this.setData({ loginLoading: false })
-      })
-  },
-
-  updateWechatProfile() {
-    if (this.data.profileLoading) return
-    this.setData({ profileLoading: true })
-    this.getWechatUserProfile()
-      .then(async (profile) => {
-        const result = await api.updateWechatProfile(profile)
-        console.log('wechat profile response', result)
-        wx.setStorageSync('user', result.user)
-        this.refreshUser()
-        wx.showToast({ title: '头像已更新', icon: 'success' })
-      })
-      .catch((error) => {
-        wx.showToast({ title: error.error || '头像授权失败', icon: 'none' })
-      })
-      .finally(() => {
-        this.setData({ profileLoading: false })
       })
   },
 
@@ -98,13 +92,12 @@ Page({
     this.setData({ profileLoading: true })
     return api.updateWechatProfile(profile)
       .then((result) => {
-        console.log('wechat profile response', result)
         wx.setStorageSync('user', result.user)
         this.refreshUser()
         wx.showToast({ title: successTitle, icon: 'success' })
       })
       .catch((error) => {
-        wx.showToast({ title: error.error || '头像授权失败', icon: 'none' })
+        wx.showToast({ title: error.error || '资料更新失败', icon: 'none' })
       })
       .finally(() => {
         this.setData({ profileLoading: false })
@@ -145,6 +138,49 @@ Page({
         fail: () => reject({ error: '微信登录失败' })
       })
     })
+  },
+
+  openOrders(event) {
+    if (!this.data.isLoggedIn) {
+      wx.showToast({ title: '请先登录', icon: 'none' })
+      return
+    }
+
+    const status = event && event.currentTarget && event.currentTarget.dataset
+      ? event.currentTarget.dataset.status || ''
+      : ''
+    wx.navigateTo({
+      url: `/pages/orders/index${status ? `?status=${status}` : ''}`
+    })
+  },
+
+  openCart() {
+    if (!this.data.isLoggedIn) {
+      wx.showToast({ title: '请先登录', icon: 'none' })
+      return
+    }
+    wx.switchTab({ url: '/pages/cart/index' })
+  },
+
+  handleOrderShortcut(event) {
+    const { key } = event.currentTarget.dataset
+    if (key === 'cart') {
+      this.openCart()
+      return
+    }
+    if (key === 'pay') {
+      this.openOrders({ currentTarget: { dataset: { status: 'pending_payment' } } })
+      return
+    }
+    if (key === 'travel') {
+      this.openOrders({ currentTarget: { dataset: { status: 'pending_travel' } } })
+      return
+    }
+    if (key === 'done') {
+      this.openOrders({ currentTarget: { dataset: { status: 'completed' } } })
+      return
+    }
+    this.openOrders({ currentTarget: { dataset: { status: '' } } })
   },
 
   logout() {

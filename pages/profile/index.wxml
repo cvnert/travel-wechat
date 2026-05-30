@@ -5,57 +5,54 @@
     <view class="hero-ridge hero-ridge-front"></view>
     <view class="hero-mask"></view>
     <view class="member-content">
-      <button wx:if="{{isLoggedIn}}" class="avatar-wrap avatar-button" open-type="chooseAvatar" bindchooseavatar="onChooseAvatar" loading="{{profileLoading}}">
-        <image wx:if="{{avatarUrl}}" class="avatar-img" src="{{avatarUrl}}" mode="aspectFill"></image>
-        <view wx:else class="avatar-placeholder">{{avatarText}}</view>
-      </button>
-      <view wx:else class="avatar-wrap" bindtap="handleLoginTap">
+      <view class="avatar-wrap" bindtap="handleLoginTap">
         <image wx:if="{{avatarUrl}}" class="avatar-img" src="{{avatarUrl}}" mode="aspectFill"></image>
         <view wx:else class="avatar-placeholder">{{avatarText}}</view>
       </view>
       <view class="member-info" bindtap="handleLoginTap">
-        <view class="member-name">{{isLoggedIn ? nickname : '点击显示微信头像'}}</view>
-        <view class="member-desc">{{isLoggedIn ? '旅邦旅游会员' : '登录后查看订单和专属优惠'}}</view>
+        <view class="member-name">{{memberNameText}}</view>
+        <view class="member-desc">{{memberDescText}}</view>
+        <button wx:if="{{isLoggedIn}}" class="avatar-edit-button" open-type="chooseAvatar" bindchooseavatar="onChooseAvatar" loading="{{profileLoading}}">更换头像</button>
       </view>
       <view class="member-code" bindtap="showComingSoon">
-        <view class="code-icon">▦</view>
+        <view class="code-icon">码</view>
         <view class="code-text">会员码</view>
       </view>
     </view>
   </view>
 
   <view class="login-strip">
-    <view class="login-copy">{{isLoggedIn ? '订单管理更轻松，优惠信息不错过' : '登录手机号，订单管理更轻松，优惠信息不错过'}}</view>
-    <button wx:if="{{!isLoggedIn}}" class="login-button" loading="{{loginLoading}}" bindtap="wechatLogin">登录</button>
-    <button wx:else class="logout-button" bindtap="logout">退出</button>
+    <view class="login-copy">{{loginCopyText}}</view>
+    <button wx:if="{{showLoginButton}}" class="login-button" loading="{{loginLoading}}" bindtap="wechatLogin">登录</button>
+    <button wx:if="{{showLogoutButton}}" class="logout-button" bindtap="logout">退出</button>
   </view>
 
-  <view class="coupon-row" bindtap="showComingSoon">
+  <view class="coupon-row" bindtap="openCart">
     <view class="row-left">
-      <view class="row-icon">券</view>
-      <view class="row-title">优惠券/码</view>
+      <view class="row-icon">车</view>
+      <view class="row-title">购物车</view>
     </view>
     <view class="row-right">
-      <text>0</text>
+      <text>去结算</text>
       <text class="chevron">›</text>
     </view>
   </view>
 
-  <view class="share-banner" bindtap="showComingSoon">
+  <view class="share-banner" bindtap="openOrders">
     <view class="share-sun"></view>
     <view class="share-wave share-wave-back"></view>
     <view class="share-wave share-wave-front"></view>
     <view class="share-mask"></view>
-    <view class="share-title">“旅”友分享会</view>
+    <view class="share-title">订单查询</view>
   </view>
 
   <view class="order-card">
     <view class="card-head">
       <view class="card-title">我的订单</view>
-      <view class="card-link" bindtap="showComingSoon">查看全部订单 ›</view>
+      <view class="card-link" bindtap="openOrders">查看全部订单 ›</view>
     </view>
     <view class="order-grid">
-      <view class="order-item" wx:for="{{orderItems}}" wx:key="key" bindtap="showComingSoon">
+      <view class="order-item" wx:for="{{orderItems}}" wx:key="key" data-key="{{item.key}}" bindtap="handleOrderShortcut">
         <view class="order-icon">{{item.icon}}</view>
         <view class="order-label">{{item.label}}</view>
       </view>
@@ -63,17 +60,24 @@
   </view>
 
   <view class="menu-list">
-    <view class="menu-row" bindtap="showComingSoon">
+    <view class="menu-row" bindtap="openOrders" data-status="pending_payment">
       <view class="row-left">
-        <view class="row-icon">约</view>
-        <view class="row-title">我的预约单</view>
+        <view class="row-icon">付</view>
+        <view class="row-title">待支付订单</view>
       </view>
       <view class="chevron">›</view>
     </view>
-    <view class="menu-row" bindtap="showComingSoon">
+    <view class="menu-row" bindtap="openOrders" data-status="pending_travel">
       <view class="row-left">
-        <view class="row-icon">卡</view>
-        <view class="row-title">计次卡</view>
+        <view class="row-icon">行</view>
+        <view class="row-title">待出行订单</view>
+      </view>
+      <view class="chevron">›</view>
+    </view>
+    <view class="menu-row" bindtap="openOrders" data-status="completed">
+      <view class="row-left">
+        <view class="row-icon">旅</view>
+        <view class="row-title">已出行订单</view>
       </view>
       <view class="chevron">›</view>
     </view>

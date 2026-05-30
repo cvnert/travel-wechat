@@ -1,5 +1,5 @@
-const api = require('../../utils/api')
-const { formatPrice } = require('../../utils/format')
+const api = require('../../utils/api.js')
+const { formatPrice } = require('../../utils/format.js')
 
 function normalizeFeaturedProducts(list) {
   return (list || []).map((item) => {
@@ -13,9 +13,24 @@ function normalizeFeaturedProducts(list) {
       ...item,
       priceText: formatPrice(item.price),
       coverDisplayUrl: cover,
-      bannerDisplayUrls: images.filter(Boolean)
+      bannerDisplayUrls: images.filter(Boolean),
+      descText: item.shortDescription || item.summary || '探索适合你的下一段旅程',
+      salesText: String(Number(item.salesCount || 0))
     }
   })
+}
+
+function buildHomeViewState(loading, home, products) {
+  const heroBanners = home && home.heroBanners ? home.heroBanners : []
+  const quickCategories = home && home.quickCategories ? home.quickCategories : []
+
+  return {
+    showHeroSwiper: heroBanners.length > 0,
+    showHeroEmpty: loading && heroBanners.length === 0,
+    showQuickCategories: quickCategories.length > 0,
+    showProductLoading: loading && products.length === 0,
+    showProductEmpty: !loading && products.length === 0
+  }
 }
 
 Page({
@@ -37,7 +52,12 @@ Page({
     },
     products: [],
     fallbackProducts: [],
-    swiperImages: []
+    swiperImages: [],
+    showHeroSwiper: false,
+    showHeroEmpty: false,
+    showQuickCategories: false,
+    showProductLoading: false,
+    showProductEmpty: false
   },
 
   onLoad() {
@@ -59,27 +79,33 @@ Page({
   },
 
   async loadHome() {
-    this.setData({ loading: true })
+    this.setData({
+      loading: true,
+      ...buildHomeViewState(true, this.data.home, this.data.products)
+    })
     try {
       const result = await api.getHomeContent()
       const home = result.home || {}
       const featuredProducts = normalizeFeaturedProducts(home.featuredProducts || [])
       const swiperImages = (home.heroBanners || []).map((item) => item.imageUrl).filter(Boolean)
+      const nextHome = {
+        location: home.location || '滇西北',
+        brandName: home.brandName || '旅邦旅游',
+        sectionTitle: home.sectionTitle || '线路预订',
+        sectionSubtitle: home.sectionSubtitle || '精选旅行线路、活动套餐与周边服务',
+        quickCategories: home.quickCategories || [],
+        heroBanners: home.heroBanners || [],
+        featuredProducts
+      }
+
       this.setData({
-        home: {
-          location: home.location || '滇西北',
-          brandName: home.brandName || '旅邦旅游',
-          sectionTitle: home.sectionTitle || '线路预订',
-          sectionSubtitle: home.sectionSubtitle || '精选旅行线路、活动套餐与周边服务',
-          quickCategories: home.quickCategories || [],
-          heroBanners: home.heroBanners || [],
-          featuredProducts
-        },
+        home: nextHome,
         products: featuredProducts,
         fallbackProducts: featuredProducts,
         swiperImages: swiperImages.length ? swiperImages : featuredProducts.map((item) => item.coverDisplayUrl).filter(Boolean),
         page: 2,
-        hasMore: featuredProducts.length >= this.data.pageSize
+        hasMore: featuredProducts.length >= this.data.pageSize,
+        ...buildHomeViewState(true, nextHome, featuredProducts)
       })
       if (featuredProducts.length === 0) {
         await this.loadProducts(true)
@@ -88,7 +114,10 @@ Page({
       await this.loadProducts(true)
       wx.showToast({ title: error.error || '首页内容加载失败', icon: 'none' })
     } finally {
-      this.setData({ loading: false })
+      this.setData({
+        loading: false,
+        ...buildHomeViewState(false, this.data.home, this.data.products)
+      })
     }
   },
 
@@ -104,7 +133,8 @@ Page({
         fallbackProducts: reset ? nextProducts : this.data.fallbackProducts.concat(nextProducts),
         page: page + 1,
         hasMore: products.length < Number(result.total || 0),
-        swiperImages: this.data.swiperImages.length ? this.data.swiperImages : products.map((item) => item.coverDisplayUrl).filter(Boolean)
+        swiperImages: this.data.swiperImages.length ? this.data.swiperImages : products.map((item) => item.coverDisplayUrl).filter(Boolean),
+        ...buildHomeViewState(this.data.loading, this.data.home, products)
       })
     } catch (error) {
       wx.showToast({ title: error.error || '加载失败', icon: 'none' })

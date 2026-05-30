@@ -1,7 +1,27 @@
 {
-  "description": "\u65c5\u884c\u793e\u5c0f\u7a0b\u5e8f",
+  "description": "旅行社小程序",
   "packOptions": {
     "ignore": [
+      {
+        "value": ".deploy-admin",
+        "type": "folder"
+      },
+      {
+        "value": ".deploy-backend",
+        "type": "folder"
+      },
+      {
+        "value": ".deploy-go-cache",
+        "type": "folder"
+      },
+      {
+        "value": ".deploy-go-gopath",
+        "type": "folder"
+      },
+      {
+        "value": ".git",
+        "type": "folder"
+      },
       {
         "value": "tests",
         "type": "folder"
@@ -18,14 +38,14 @@
     "es6": true,
     "enhance": true,
     "postcss": true,
-    "minified": true,
+    "minified": false,
     "compileWorklet": false,
     "uglifyFileName": false,
     "uploadWithSourceMap": true,
     "packNpmManually": false,
     "packNpmRelationList": [],
-    "minifyWXSS": true,
-    "minifyWXML": true,
+    "minifyWXSS": false,
+    "minifyWXML": false,
     "localPlugins": false,
     "disableUseStrict": false,
     "useCompilerPlugins": false,

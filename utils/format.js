@@ -1,20 +1,26 @@
-const { getApiBaseUrl } = require('./config')
+var DEFAULT_API_BASE_URL = 'https://cvnert.com.cn'
+
+function getApiBaseUrl() {
+  var app = typeof getApp === 'function' ? getApp() : null
+  var apiBaseUrl = app && app.globalData ? app.globalData.apiBaseUrl : ''
+  return apiBaseUrl || DEFAULT_API_BASE_URL
+}
 
 function formatPrice(value) {
-  const numberValue = Number(value)
-  if (!Number.isFinite(numberValue)) {
-    return '￥0.00'
+  var numberValue = Number(value)
+  if (!isFinite(numberValue)) {
+    return '\u00A5' + '0.00'
   }
-  return `￥${numberValue.toFixed(2)}`
+  return '\u00A5' + numberValue.toFixed(2)
 }
 
 function normalizeImageUrl(url) {
   if (!url) return ''
   if (/^https?:\/\//i.test(url)) return url
-  return `${getApiBaseUrl().replace(/\/$/, '')}${url}`
+  return getApiBaseUrl().replace(/\/$/, '') + url
 }
 
 module.exports = {
-  formatPrice,
-  normalizeImageUrl
+  formatPrice: formatPrice,
+  normalizeImageUrl: normalizeImageUrl
 }

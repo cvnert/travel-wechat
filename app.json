@@ -2,7 +2,10 @@
   "pages": [
     "pages/home/index",
     "pages/profile/index",
-    "pages/product-detail/index"
+    "pages/product-detail/index",
+    "pages/cart/index",
+    "pages/orders/index",
+    "pages/order-detail/index"
   ],
   "window": {
     "navigationBarTitleText": "\u7cbe\u9009\u65c5\u884c\u7ebf\u8def",
@@ -21,6 +24,12 @@
         "text": "\u9996\u9875",
         "iconPath": "assets/tab-home.png",
         "selectedIconPath": "assets/tab-home-active.png"
+      },
+      {
+        "pagePath": "pages/cart/index",
+        "text": "\u8d2d\u7269\u8f66",
+        "iconPath": "assets/tab-cart.png",
+        "selectedIconPath": "assets/tab-cart-active.png"
       },
       {
         "pagePath": "pages/profile/index",

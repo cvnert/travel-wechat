@@ -1,0 +1,65 @@
+<view class="orders-page">
+  <scroll-view scroll-x class="tabs" enable-flex="true">
+    <view
+      wx:for="{{statusTabs}}"
+      wx:key="key"
+      class="{{item.tabClass}}"
+      data-status="{{item.key}}"
+      bindtap="switchStatus"
+    >
+      {{item.label}}
+    </view>
+  </scroll-view>
+
+  <view wx:if="{{showLoadingState}}" class="empty-card">正在加载订单...</view>
+
+  <view wx:elif="{{showEmptyState}}" class="empty-card">
+    <view class="empty-title">还没有订单</view>
+    <view class="empty-desc">下单并完成支付后，待出行和已出行订单都会出现在这里。</view>
+    <button class="primary-button empty-button" bindtap="goHome">去看看产品</button>
+  </view>
+
+  <view wx:else class="order-list">
+    <view wx:for="{{orders}}" wx:for-item="order" wx:key="id" class="order-card" data-id="{{order.id}}" bindtap="openOrderDetail">
+      <view class="order-head">
+        <view>
+          <view class="order-no">订单号 {{order.orderNo}}</view>
+          <view wx:if="{{order.verificationCode}}" class="voucher-line">凭证码 {{order.verificationCode}}</view>
+        </view>
+        <view class="order-status order-status-{{order.statusTone}}">{{order.statusText}}</view>
+      </view>
+
+      <view wx:for="{{order.items}}" wx:for-item="orderItem" wx:key="id" class="order-item">
+        <image class="item-cover" src="{{orderItem.coverDisplayUrl}}" mode="aspectFill" />
+        <view class="item-info">
+          <view class="item-title">{{orderItem.productTitle}}</view>
+          <view class="item-meta">{{orderItem.unitPriceText}} x {{orderItem.quantity}}</view>
+        </view>
+        <view class="item-subtotal">{{orderItem.subtotalText}}</view>
+      </view>
+
+      <view class="order-foot">
+        <view class="order-total">共 {{order.totalQuantity}} 件，合计 {{order.totalAmountText}}</view>
+        <view class="order-actions">
+          <button
+            wx:if="{{order.showPayAction}}"
+            class="primary-button pay-button"
+            data-id="{{order.id}}"
+            loading="{{order.isPaying}}"
+            catchtap="payOrder"
+          >
+            立即支付
+          </button>
+          <button
+            wx:else
+            class="ghost-button detail-button"
+            data-id="{{order.id}}"
+            catchtap="openOrderDetail"
+          >
+            {{order.actionLabel}}
+          </button>
+        </view>
+      </view>
+    </view>
+  </view>
+</view>

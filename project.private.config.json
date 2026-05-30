@@ -1,7 +1,7 @@
 {
   "description": "Local developer config",
   "setting": {
-    "compileHotReLoad": true,
+    "compileHotReLoad": false,
     "urlCheck": false,
     "coverView": false,
     "lazyloadPlaceholderEnable": false,

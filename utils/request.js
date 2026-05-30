@@ -1,4 +1,4 @@
-const { getApiBaseUrl } = require('./config')
+const { getApiBaseUrl } = require('./config.js')
 
 function request(options) {
   const token = wx.getStorageSync('token')

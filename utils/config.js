@@ -1,7 +1,7 @@
-const app = getApp()
-
 function getApiBaseUrl() {
-  return app.globalData.apiBaseUrl || 'http://cvnert.com.cn:8080'
+  const app = typeof getApp === 'function' ? getApp() : null
+  const apiBaseUrl = app && app.globalData ? app.globalData.apiBaseUrl : ''
+  return apiBaseUrl || 'https://cvnert.com.cn'
 }
 
 module.exports = {

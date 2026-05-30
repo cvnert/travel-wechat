@@ -10,8 +10,8 @@
       <view class="title">{{product.title}}</view>
       <view wx:if="{{product.tag}}" class="tag">{{product.tag}}</view>
     </view>
-    <view wx:if="{{product.summary || product.shortDescription}}" class="summary">
-      {{product.summary || product.shortDescription}}
+    <view wx:if="{{product.hasSummary}}" class="summary">
+      {{product.summaryText}}
     </view>
     <view class="meta">
       <view class="price">{{product.priceText}}</view>
@@ -43,13 +43,29 @@
       <text class="section-text">{{product.travelNotice}}</text>
     </view>
     <view wx:if="{{product.refundPolicy}}" class="section">
-      <view class="section-title">退款/改期说明</view>
+      <view class="section-title">退改说明</view>
       <text class="section-text">{{product.refundPolicy}}</text>
     </view>
   </view>
 
   <view class="bottom-bar">
-    <button class="ghost-button action" bindtap="callService">咨询</button>
-    <button class="primary-button action" bindtap="reserve">立即预订</button>
+    <view class="tool-group">
+      <view class="tool-item" bindtap="callService">
+        <view class="tool-icon">客</view>
+        <view class="tool-label">客服</view>
+      </view>
+      <view class="tool-item" bindtap="openCart">
+        <view class="tool-icon tool-icon-cart">
+          <text class="tool-icon-text">车</text>
+          <view wx:if="{{cartCount > 0}}" class="cart-badge">{{cartBadgeText}}</view>
+        </view>
+        <view class="tool-label">购物车</view>
+      </view>
+    </view>
+
+    <view class="cta-group">
+      <button class="cta-button cta-cart" loading="{{actionLoading}}" bindtap="addToCart">加入购物车</button>
+      <button class="cta-button cta-buy" loading="{{actionLoading}}" bindtap="reserve">立即购买</button>
+    </view>
   </view>
 </view>
