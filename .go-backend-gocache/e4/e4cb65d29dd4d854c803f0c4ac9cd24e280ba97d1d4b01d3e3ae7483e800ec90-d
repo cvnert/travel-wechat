@@ -1,0 +1,3 @@
+./jwt.go
+./password.go
+./auth_test.go

@@ -1,0 +1,16 @@
+# test log
+getenv GOTMPDIR
+stat C:\Users\ADMINI~1\AppData\Local\Temp\TestFindDotEnvUpwardsFindsParentEnv4193213434\001\cmd\server
+stat C:\Users\ADMINI~1\AppData\Local\Temp\TestFindDotEnvUpwardsFindsParentEnv4193213434\001\cmd
+stat C:\Users\ADMINI~1\AppData\Local\Temp\TestFindDotEnvUpwardsFindsParentEnv4193213434\001
+open C:\Users\ADMINI~1\AppData\Local\Temp\TestFindDotEnvUpwardsFindsParentEnv4193213434\001\.env
+stat C:\Users\ADMINI~1\AppData\Local\Temp\TestFindDotEnvUpwardsFindsParentEnv4193213434\001\cmd\server\.env
+stat C:\Users\ADMINI~1\AppData\Local\Temp\TestFindDotEnvUpwardsFindsParentEnv4193213434\001\cmd\.env
+stat C:\Users\ADMINI~1\AppData\Local\Temp\TestFindDotEnvUpwardsFindsParentEnv4193213434\001\.env
+open C:\Users\ADMINI~1\AppData\Local\Temp
+getenv GOTMPDIR
+open C:\Users\ADMINI~1\AppData\Local\Temp\TestOverloadDotEnvSupportsUTF8BOM3634427225\001\.env
+getenv DATABASE_URL
+open C:\Users\ADMINI~1\AppData\Local\Temp\TestOverloadDotEnvSupportsUTF8BOM3634427225\001\.env
+getenv DATABASE_URL
+open C:\Users\ADMINI~1\AppData\Local\Temp

@@ -1,22 +1,68 @@
 const api = require('../../utils/api.js')
+const wechatAuth = require('../../utils/wechat-auth.js')
 
 const USER_PROFILE_DESC = '用于完善旅行会员资料'
+const ICON_BASE = '../../assets'
+
+function withIcon(file) {
+  return `${ICON_BASE}/${file}`
+}
+
+function buildMemberShortcuts() {
+  return [
+    { key: 'pay', title: '待支付', desc: '去处理', icon: withIcon('order-pay.svg') },
+    { key: 'travel', title: '待出行', desc: '看凭证', icon: withIcon('order-travel.svg') },
+    { key: 'done', title: '已出行', desc: '看记录', icon: withIcon('order-done.svg') }
+  ]
+}
+
+function buildOrderItems() {
+  return [
+    { key: 'pay', label: '待支付', icon: withIcon('order-pay.svg') },
+    { key: 'travel', label: '待出行', icon: withIcon('order-travel.svg') },
+    { key: 'done', label: '已出行', icon: withIcon('order-done.svg') },
+    { key: 'all', label: '全部订单', icon: withIcon('order-all.svg') },
+    { key: 'cart', label: '购物车', icon: withIcon('order-cart.svg') }
+  ]
+}
+
+function buildMenuItems() {
+  return [
+    { key: 'pay', status: 'pending_payment', title: '待支付订单', icon: withIcon('order-pay.svg') },
+    { key: 'travel', status: 'pending_travel', title: '待出行订单', icon: withIcon('order-travel.svg') },
+    { key: 'done', status: 'completed', title: '已出行订单', icon: withIcon('order-done.svg') }
+  ]
+}
+
+function normalizeUser(user) {
+  const nextUser = user || {}
+  const rawAvatarUrl = nextUser.avatarUrl || nextUser.avatarURL || ''
+  const avatarUrl = api.resolveMediaUrl ? api.resolveMediaUrl(rawAvatarUrl) : rawAvatarUrl
+  return {
+    ...nextUser,
+    avatarUrl
+  }
+}
 
 function buildProfileViewState(token, user) {
+  const normalizedUser = normalizeUser(user)
   const isLoggedIn = Boolean(token)
-  const nickname = user.nickname || user.username || '微信用户'
-  const avatarUrl = user.avatarUrl || user.avatarURL || ''
+  const nickname = normalizedUser.nickname || normalizedUser.username || '微信用户'
+  const avatarUrl = normalizedUser.avatarUrl || ''
 
   return {
     isLoggedIn,
     nickname,
     avatarUrl,
     avatarText: nickname.slice(0, 1) || '旅',
-    memberNameText: isLoggedIn ? nickname : '点击登录查看订单',
-    memberDescText: isLoggedIn ? '旅行会员中心' : '登录后同步头像、购物车和订单',
-    loginCopyText: isLoggedIn ? '订单、凭证和出行状态都可以在这里统一查看' : '登录后可加入购物车、支付并查询订单',
+    memberBadgeText: isLoggedIn ? '旅邮会员' : '微信登录',
+    memberNameText: isLoggedIn ? nickname : '点击微信登录',
+    memberDescText: isLoggedIn
+      ? '订单、凭证、出行状态都在这里统一查看'
+      : '登录后同步头像、订单和购物车',
     showLoginButton: !isLoggedIn,
-    showLogoutButton: isLoggedIn
+    showLogoutButton: isLoggedIn,
+    memberShortcuts: buildMemberShortcuts()
   }
 }
 
@@ -26,20 +72,17 @@ Page({
     nickname: '',
     avatarUrl: '',
     avatarText: '旅',
-    memberNameText: '点击登录查看订单',
-    memberDescText: '登录后同步头像、购物车和订单',
-    loginCopyText: '登录后可加入购物车、支付并查询订单',
+    memberBadgeText: '微信登录',
+    memberNameText: '点击微信登录',
+    memberDescText: '登录后同步头像、订单和购物车',
     showLoginButton: true,
     showLogoutButton: false,
     loginLoading: false,
     profileLoading: false,
-    orderItems: [
-      { key: 'pay', icon: '付', label: '待支付' },
-      { key: 'travel', icon: '行', label: '待出行' },
-      { key: 'done', icon: '旅', label: '已出行' },
-      { key: 'all', icon: '单', label: '全部订单' },
-      { key: 'cart', icon: '车', label: '购物车' }
-    ]
+    memberShortcuts: buildMemberShortcuts(),
+    orderItems: buildOrderItems(),
+    menuItems: buildMenuItems(),
+    cartIcon: withIcon('order-cart.svg')
   },
 
   onShow() {
@@ -54,18 +97,22 @@ Page({
 
   handleLoginTap() {
     if (!this.data.isLoggedIn) {
-      wx.showToast({ title: '请先登录', icon: 'none' })
+      return this.wechatLogin()
     }
+    return Promise.resolve()
   },
 
   wechatLogin() {
-    if (this.data.loginLoading) return
+    if (this.data.loginLoading) {
+      return Promise.resolve()
+    }
+
     this.setData({ loginLoading: true })
-    this.getWechatLoginCode()
-      .then(async (code) => {
-        const result = await api.wechatLogin(code)
+    return wechatAuth.loginWithWechat(USER_PROFILE_DESC)
+      .then((result) => {
+        const user = normalizeUser(result.user)
         wx.setStorageSync('token', result.token)
-        wx.setStorageSync('user', result.user)
+        wx.setStorageSync('user', user)
         this.refreshUser()
         wx.showToast({ title: '登录成功', icon: 'success' })
       })
@@ -80,64 +127,45 @@ Page({
   onChooseAvatar(event) {
     if (!this.data.isLoggedIn) {
       wx.showToast({ title: '请先登录', icon: 'none' })
-      return
+      return Promise.resolve()
     }
+
     const avatarUrl = event.detail && event.detail.avatarUrl
-    if (!avatarUrl) return
-    this.saveWechatProfile({ avatarUrl }, '头像已更新')
+    if (!avatarUrl) {
+      return Promise.resolve()
+    }
+
+    return this.uploadAvatar(avatarUrl)
   },
 
-  saveWechatProfile(profile, successTitle) {
-    if (this.data.profileLoading) return Promise.resolve()
-    this.setData({ profileLoading: true })
-    return api.updateWechatProfile(profile)
+  uploadAvatar(filePath) {
+    if (this.data.profileLoading) {
+      return Promise.resolve()
+    }
+
+    const previousAvatarUrl = this.data.avatarUrl
+    this.setData({
+      profileLoading: true,
+      avatarUrl: filePath || previousAvatarUrl
+    })
+
+    return api.uploadAvatar(filePath)
       .then((result) => {
-        wx.setStorageSync('user', result.user)
+        const user = normalizeUser(result.user)
+        wx.setStorageSync('user', user)
         this.refreshUser()
-        wx.showToast({ title: successTitle, icon: 'success' })
+        if (filePath) {
+          this.setData({ avatarUrl: filePath })
+        }
+        wx.showToast({ title: '头像已更新', icon: 'success' })
       })
       .catch((error) => {
-        wx.showToast({ title: error.error || '资料更新失败', icon: 'none' })
+        this.setData({ avatarUrl: previousAvatarUrl })
+        wx.showToast({ title: error.error || '头像上传失败', icon: 'none' })
       })
       .finally(() => {
         this.setData({ profileLoading: false })
       })
-  },
-
-  getWechatUserProfile() {
-    return new Promise((resolve, reject) => {
-      wx.getUserProfile({
-        desc: USER_PROFILE_DESC,
-        success: (res) => {
-          const userInfo = res.userInfo || {}
-          resolve({
-            nickName: userInfo.nickName || '',
-            avatarUrl: userInfo.avatarUrl || '',
-            gender: userInfo.gender || 0,
-            country: userInfo.country || '',
-            province: userInfo.province || '',
-            city: userInfo.city || '',
-            language: userInfo.language || ''
-          })
-        },
-        fail: () => reject({ error: '需要授权头像昵称后才能登录' })
-      })
-    })
-  },
-
-  getWechatLoginCode() {
-    return new Promise((resolve, reject) => {
-      wx.login({
-        success: (loginResult) => {
-          if (!loginResult.code) {
-            reject({ error: '微信登录失败' })
-            return
-          }
-          resolve(loginResult.code)
-        },
-        fail: () => reject({ error: '微信登录失败' })
-      })
-    })
   },
 
   openOrders(event) {
@@ -190,7 +218,9 @@ Page({
       confirmText: '退出',
       confirmColor: '#ef4444',
       success: (res) => {
-        if (!res.confirm) return
+        if (!res.confirm) {
+          return
+        }
         wx.removeStorageSync('token')
         wx.removeStorageSync('user')
         this.refreshUser()

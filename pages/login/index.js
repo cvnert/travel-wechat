@@ -1,11 +1,21 @@
 const api = require('../../utils/api.js')
+const wechatAuth = require('../../utils/wechat-auth.js')
 
-const USER_PROFILE_DESC = '用于完善旅邦旅游会员资料'
+const USER_PROFILE_DESC = '用于完善旅邮旅游会员资料'
+
+function normalizeUser(user) {
+  const nextUser = user || {}
+  const rawAvatarUrl = nextUser.avatarUrl || nextUser.avatarURL || ''
+  const avatarUrl = api.resolveMediaUrl ? api.resolveMediaUrl(rawAvatarUrl) : rawAvatarUrl
+  return {
+    ...nextUser,
+    avatarUrl
+  }
+}
 
 function finishLogin(result) {
-  console.log('login response', result)
   wx.setStorageSync('token', result.token)
-  wx.setStorageSync('user', result.user)
+  wx.setStorageSync('user', normalizeUser(result.user))
   const pages = getCurrentPages()
   if (pages.length > 1) {
     wx.navigateBack()
@@ -64,13 +74,13 @@ Page({
   },
 
   wechatLogin() {
-    if (this.data.loading) return
+    if (this.data.loading) {
+      return Promise.resolve()
+    }
+
     this.setData({ loading: true })
-    this.getWechatUserProfile()
-      .then((profile) => this.getWechatLoginCode().then((code) => ({ code, profile })))
-      .then(async ({ code, profile }) => {
-        const result = await api.wechatLogin(code, profile)
-        console.log('wechat login response', result)
+    return wechatAuth.loginWithWechat(USER_PROFILE_DESC)
+      .then((result) => {
         finishLogin(result)
       })
       .catch((error) => {
@@ -79,41 +89,5 @@ Page({
       .finally(() => {
         this.setData({ loading: false })
       })
-  },
-
-  getWechatUserProfile() {
-    return new Promise((resolve, reject) => {
-      wx.getUserProfile({
-        desc: USER_PROFILE_DESC,
-        success: (res) => {
-          const userInfo = res.userInfo || {}
-          resolve({
-            nickName: userInfo.nickName || '',
-            avatarUrl: userInfo.avatarUrl || '',
-            gender: userInfo.gender || 0,
-            country: userInfo.country || '',
-            province: userInfo.province || '',
-            city: userInfo.city || '',
-            language: userInfo.language || ''
-          })
-        },
-        fail: () => reject({ error: '需要授权头像昵称后才能登录' })
-      })
-    })
-  },
-
-  getWechatLoginCode() {
-    return new Promise((resolve, reject) => {
-      wx.login({
-        success: (loginResult) => {
-          if (!loginResult.code) {
-            reject({ error: '微信登录失败' })
-            return
-          }
-          resolve(loginResult.code)
-        },
-        fail: () => reject({ error: '微信登录失败' })
-      })
-    })
   }
 })

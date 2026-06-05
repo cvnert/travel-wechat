@@ -1,0 +1,17 @@
+./auth.go
+./bucket.go
+./bucket_acl.go
+./bucket_cors.go
+./bucket_lifecycle.go
+./bucket_location.go
+./bucket_part.go
+./bucket_tagging.go
+./cos.go
+./doc.go
+./error.go
+./helper.go
+./http.go
+./object.go
+./object_acl.go
+./object_part.go
+./service.go

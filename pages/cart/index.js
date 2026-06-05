@@ -23,6 +23,7 @@ function normalizeCartItems(list) {
       quantity,
       subtotalAmount,
       quantityText: `x${quantity}`,
+      travelDateText: item.travelDate ? `出发 ${item.travelDate}` : '',
       product: {
         ...product,
         priceText: formatPrice(product.price),
@@ -31,7 +32,7 @@ function normalizeCartItems(list) {
         summaryText: product.shortDescription || product.summary || '出行信息可在下单后查看',
         bookingText: '定金预订',
         serviceText: product.tag || '官方精选',
-        guaranteeText: '放心购 · 平台客服全程协助',
+        guaranteeText: '放心购· 平台客服全程协助',
         priceCaption: '预订价'
       }
     }
@@ -271,6 +272,12 @@ Page({
       wx.showToast({ title: '请选择商品', icon: 'none' })
       return
     }
+    const selectedItems = this.data.cartItems.filter((item) => selectedIds.includes(item.id))
+    const travelDates = Array.from(new Set(selectedItems.map((item) => item.travelDate).filter(Boolean)))
+    if (travelDates.length !== 1) {
+      wx.showToast({ title: '请选择同一天出发的商品', icon: 'none' })
+      return
+    }
     if (this.data.paying) {
       return
     }
@@ -278,7 +285,7 @@ Page({
     this.setData({ paying: true })
     var createdOrder = null
     try {
-      const createResult = await api.createOrder(selectedIds)
+      const createResult = await api.createOrder(selectedIds, travelDates[0])
       createdOrder = createResult.order || null
       const payResult = await api.payOrder(createdOrder.id)
       const currentOrder = payResult.order || createdOrder

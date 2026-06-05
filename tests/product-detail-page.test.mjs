@@ -37,7 +37,8 @@ test('product detail page exposes taobao-style bottom actions', () => {
   const page = loadPage({
     '../../utils/api': {},
     '../../utils/auth': { requireLogin: () => true },
-    '../../utils/format': { formatPrice: (value) => String(value) }
+    '../../utils/format': { formatPrice: (value) => String(value) },
+    '../../utils/travel-date': { buildTravelDateCalendar: () => ({ months: [], days: [], selectedDate: '', selectedDay: null, selectedPriceText: '0' }) }
   })
   const wxml = fs.readFileSync(path.join(__dirname, '../pages/product-detail/index.wxml'), 'utf8')
 
@@ -47,4 +48,17 @@ test('product detail page exposes taobao-style bottom actions', () => {
   assert.equal(typeof page.refreshCartCount, 'function')
   assert.doesNotMatch(wxml, /店铺/)
   assert.doesNotMatch(wxml, /bindtap="openHome"/)
+})
+
+test('product detail page locks background scroll while the travel drawer is open', () => {
+  const wxml = fs.readFileSync(path.join(__dirname, '../pages/product-detail/index.wxml'), 'utf8')
+  const json = fs.readFileSync(path.join(__dirname, '../pages/product-detail/index.json'), 'utf8')
+
+  assert.match(wxml, /<scroll-view class="detail-scroll" scroll-y="\{\{detailScrollEnabled\}\}">/)
+  assert.match(wxml, /<van-calendar/)
+  assert.match(wxml, /custom-class="travel-calendar"/)
+  assert.match(wxml, /root-portal="\{\{true\}\}"/)
+  assert.doesNotMatch(wxml, /确认/)
+  assert.doesNotMatch(wxml, /取消/)
+  assert.match(json, /van-calendar/)
 })

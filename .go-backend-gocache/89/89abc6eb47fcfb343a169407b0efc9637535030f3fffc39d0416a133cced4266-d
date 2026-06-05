@@ -1,0 +1,9 @@
+./admin_user.go
+./home_banner.go
+./travel_cart_item.go
+./travel_order.go
+./travel_pricing.go
+./travel_product.go
+./user.go
+./travel_order_test.go
+./travel_pricing_test.go

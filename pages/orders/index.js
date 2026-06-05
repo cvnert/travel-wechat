@@ -15,6 +15,30 @@ const {
   isOrderPaid
 } = require('../../utils/payment.js')
 
+function formatTime(value) {
+  if (!value) {
+    return ''
+  }
+  return String(value).replace('T', ' ').slice(0, 16)
+}
+
+function buildOrderHintText(status, verificationCode) {
+  const normalizedStatus = normalizeOrderStatus(status)
+  if (verificationCode && shouldShowVoucher(normalizedStatus)) {
+    return `凭证码 ${verificationCode}`
+  }
+  switch (normalizedStatus) {
+    case 'pending_payment':
+      return '支付完成后自动生成凭证'
+    case 'pending_travel':
+      return '订单详情可查看出行凭证'
+    case 'completed':
+      return '订单详情可查看出行记录'
+    default:
+      return '订单详情可查看完整信息'
+  }
+}
+
 function buildStatusTabs(activeStatus) {
   return ORDER_STATUS_TABS.map((item) => ({
     ...item,
@@ -32,6 +56,7 @@ function decorateOrders(orders, payingOrderId) {
 function normalizeOrders(result) {
   return (result.orderList || []).map((order) => {
     const status = normalizeOrderStatus(order.status)
+    const createdAtText = formatTime(order.createdAt)
     return {
       ...order,
       status,
@@ -41,6 +66,8 @@ function normalizeOrders(result) {
       showPayAction: status === 'pending_payment',
       actionLabel: shouldShowVoucher(status) ? '查看凭证' : '查看订单',
       totalAmountText: formatPrice(order.totalAmount),
+      createdAtText,
+      headHintText: buildOrderHintText(status, order.verificationCode),
       items: (order.items || []).map((item) => ({
         ...item,
         coverDisplayUrl: item.productCoverImageUrl || item.productCoverImage || '',

@@ -45,6 +45,7 @@
         <view class="item-info">
           <view class="item-title">{{item.productTitle}}</view>
           <view class="item-meta">{{item.unitPriceText}} x {{item.quantity}}</view>
+          <view wx:if="{{item.travelDate}}" class="item-meta">出发 {{item.travelDate}}</view>
         </view>
         <view class="item-subtotal">{{item.subtotalText}}</view>
       </view>

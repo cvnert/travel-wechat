@@ -1,0 +1,3 @@
+./local_uploader.go
+./uploader.go
+./uploader_test.go

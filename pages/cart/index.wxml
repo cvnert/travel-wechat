@@ -29,6 +29,7 @@
           <view class="feature-chip feature-chip-primary">{{item.product.bookingText}}</view>
           <view class="feature-chip">{{item.product.serviceText}}</view>
         </view>
+        <view wx:if="{{item.travelDateText}}" class="travel-date-text">{{item.travelDateText}}</view>
         <view class="secure-row">
           <view class="secure-badge">保</view>
           <view class="secure-text">{{item.product.guaranteeText}}</view>

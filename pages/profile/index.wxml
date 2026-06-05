@@ -1,36 +1,55 @@
 <view class="profile-page">
   <view class="member-hero">
-    <view class="hero-sun"></view>
-    <view class="hero-ridge hero-ridge-back"></view>
-    <view class="hero-ridge hero-ridge-front"></view>
-    <view class="hero-mask"></view>
-    <view class="member-content">
-      <view class="avatar-wrap" bindtap="handleLoginTap">
-        <image wx:if="{{avatarUrl}}" class="avatar-img" src="{{avatarUrl}}" mode="aspectFill"></image>
-        <view wx:else class="avatar-placeholder">{{avatarText}}</view>
+    <view class="member-card">
+      <view class="member-top">
+        <view class="avatar-wrap" bindtap="handleLoginTap">
+          <image wx:if="{{avatarUrl}}" class="avatar-img" src="{{avatarUrl}}" mode="aspectFill"></image>
+          <view wx:else class="avatar-placeholder">{{avatarText}}</view>
+        </view>
+
+        <view class="member-info" bindtap="handleLoginTap">
+          <view class="member-badge">{{memberBadgeText}}</view>
+          <view class="member-name">{{memberNameText}}</view>
+          <view class="member-desc">{{memberDescText}}</view>
+        </view>
       </view>
-      <view class="member-info" bindtap="handleLoginTap">
-        <view class="member-name">{{memberNameText}}</view>
-        <view class="member-desc">{{memberDescText}}</view>
-        <button wx:if="{{isLoggedIn}}" class="avatar-edit-button" open-type="chooseAvatar" bindchooseavatar="onChooseAvatar" loading="{{profileLoading}}">更换头像</button>
+
+      <view class="member-actions member-actions-single" wx:if="{{showLoginButton}}">
+        <button class="member-primary-button" loading="{{loginLoading}}" bindtap="wechatLogin">微信登录</button>
       </view>
-      <view class="member-code" bindtap="showComingSoon">
-        <view class="code-icon">码</view>
-        <view class="code-text">会员码</view>
+
+      <view class="member-actions" wx:if="{{isLoggedIn}}">
+        <button class="member-primary-button" open-type="chooseAvatar" bindchooseavatar="onChooseAvatar" loading="{{profileLoading}}">更新头像</button>
+        <button wx:if="{{showLogoutButton}}" class="member-secondary-button" bindtap="logout">退出登录</button>
+      </view>
+
+      <view class="member-shortcuts">
+        <view
+          class="member-shortcut"
+          wx:for="{{memberShortcuts}}"
+          wx:key="key"
+          data-key="{{item.key}}"
+          bindtap="handleOrderShortcut"
+        >
+          <view class="member-shortcut-icon">
+            <image class="member-shortcut-icon-image" src="{{item.icon}}" mode="aspectFit"></image>
+          </view>
+          <view class="member-shortcut-title">{{item.title}}</view>
+          <view class="member-shortcut-desc">{{item.desc}}</view>
+        </view>
       </view>
     </view>
   </view>
 
-  <view class="login-strip">
-    <view class="login-copy">{{loginCopyText}}</view>
-    <button wx:if="{{showLoginButton}}" class="login-button" loading="{{loginLoading}}" bindtap="wechatLogin">登录</button>
-    <button wx:if="{{showLogoutButton}}" class="logout-button" bindtap="logout">退出</button>
-  </view>
-
-  <view class="coupon-row" bindtap="openCart">
+  <view class="feature-card cart-card" bindtap="openCart">
     <view class="row-left">
-      <view class="row-icon">车</view>
-      <view class="row-title">购物车</view>
+      <view class="row-icon">
+        <image class="row-icon-image" src="{{cartIcon}}" mode="aspectFit"></image>
+      </view>
+      <view class="row-copy">
+        <view class="row-title">购物车</view>
+        <view class="row-desc">已选行程和套餐都在这里统一结算</view>
+      </view>
     </view>
     <view class="row-right">
       <text>去结算</text>
@@ -38,12 +57,10 @@
     </view>
   </view>
 
-  <view class="share-banner" bindtap="openOrders">
-    <view class="share-sun"></view>
-    <view class="share-wave share-wave-back"></view>
-    <view class="share-wave share-wave-front"></view>
-    <view class="share-mask"></view>
-    <view class="share-title">订单查询</view>
+  <view class="query-card" bindtap="openOrders">
+    <view class="query-label">订单查询</view>
+    <view class="query-title">待支付、待出行、已出行一眼看清</view>
+    <view class="query-desc">支付后查看凭证和出行状态都会更方便</view>
   </view>
 
   <view class="order-card">
@@ -53,31 +70,27 @@
     </view>
     <view class="order-grid">
       <view class="order-item" wx:for="{{orderItems}}" wx:key="key" data-key="{{item.key}}" bindtap="handleOrderShortcut">
-        <view class="order-icon">{{item.icon}}</view>
+        <view class="order-icon">
+          <image class="order-icon-image" src="{{item.icon}}" mode="aspectFit"></image>
+        </view>
         <view class="order-label">{{item.label}}</view>
       </view>
     </view>
   </view>
 
   <view class="menu-list">
-    <view class="menu-row" bindtap="openOrders" data-status="pending_payment">
+    <view
+      class="menu-row"
+      wx:for="{{menuItems}}"
+      wx:key="key"
+      bindtap="openOrders"
+      data-status="{{item.status}}"
+    >
       <view class="row-left">
-        <view class="row-icon">付</view>
-        <view class="row-title">待支付订单</view>
-      </view>
-      <view class="chevron">›</view>
-    </view>
-    <view class="menu-row" bindtap="openOrders" data-status="pending_travel">
-      <view class="row-left">
-        <view class="row-icon">行</view>
-        <view class="row-title">待出行订单</view>
-      </view>
-      <view class="chevron">›</view>
-    </view>
-    <view class="menu-row" bindtap="openOrders" data-status="completed">
-      <view class="row-left">
-        <view class="row-icon">旅</view>
-        <view class="row-title">已出行订单</view>
+        <view class="row-icon">
+          <image class="row-icon-image" src="{{item.icon}}" mode="aspectFit"></image>
+        </view>
+        <view class="row-title">{{item.title}}</view>
       </view>
       <view class="chevron">›</view>
     </view>

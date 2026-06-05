@@ -97,12 +97,14 @@ test('loadCart selects all cart items by default and computes selected total', a
               id: 'cart-1',
               quantity: 1,
               subtotalAmount: 998,
+              travelDate: '2026-06-19',
               product: { price: 998 }
             },
             {
               id: 'cart-2',
               quantity: 2,
               subtotalAmount: 800,
+              travelDate: '2026-06-19',
               product: { price: 400 }
             }
           ]
@@ -121,14 +123,16 @@ test('loadCart selects all cart items by default and computes selected total', a
 
 test('checkout submits selected cart item ids and starts wechat payment', async () => {
   let submittedIds = null
+  let submittedTravelDate = ''
   let payOrderId = ''
   let requestedPaymentParams = null
   let waitedOrderId = ''
   let loadCartCalls = 0
   const page = loadCartPage({
     api: {
-      async createOrder(cartItemIds) {
+      async createOrder(cartItemIds, travelDate) {
         submittedIds = cartItemIds
+        submittedTravelDate = travelDate
         return { order: { id: 'order-1' } }
       },
       async payOrder(id) {
@@ -157,8 +161,8 @@ test('checkout submits selected cart item ids and starts wechat payment', async 
   })
 
   page.data.cartItems = [
-    { id: 'cart-1', quantity: 1, subtotalAmount: 998, selected: true, product: { priceText: '楼998.00' } },
-    { id: 'cart-2', quantity: 1, subtotalAmount: 500, selected: false, product: { priceText: '楼500.00' } }
+    { id: 'cart-1', quantity: 1, subtotalAmount: 998, selected: true, travelDate: '2026-06-19', product: { priceText: '楼998.00' } },
+    { id: 'cart-2', quantity: 1, subtotalAmount: 500, selected: false, travelDate: '2026-06-19', product: { priceText: '楼500.00' } }
   ]
   page.data.selectedIds = ['cart-1']
   page.loadCart = async () => {
@@ -168,6 +172,7 @@ test('checkout submits selected cart item ids and starts wechat payment', async 
   await page.checkout()
 
   assert.deepEqual(JSON.parse(JSON.stringify(submittedIds)), ['cart-1'])
+  assert.equal(submittedTravelDate, '2026-06-19')
   assert.equal(payOrderId, 'order-1')
   assert.deepEqual(JSON.parse(JSON.stringify(requestedPaymentParams)), {
     timeStamp: '1',

@@ -1,0 +1,6 @@
+./admin_user.go
+./home_banner.go
+./travel_cart_item.go
+./travel_order.go
+./travel_product.go
+./user.go

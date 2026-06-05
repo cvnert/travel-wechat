@@ -49,7 +49,31 @@ function loadApi({ apiBaseUrl = 'http://localhost:8080', requestImpl } = {}) {
   }
 }
 
-test('wechatLogin sends only the login code to the backend', async () => {
+test('wechatLogin sends code and profile when profile is provided', async () => {
+  let capturedOptions = null
+  const loaded = loadApi({
+    requestImpl(options) {
+      capturedOptions = options
+    }
+  })
+
+  const profile = {
+    nickName: '微信用户',
+    avatarUrl: 'https://example.com/avatar.png'
+  }
+
+  await loaded.api.wechatLogin('code-123', profile)
+
+  assert.ok(capturedOptions)
+  assert.equal(capturedOptions.url, 'http://localhost:8080/api/auth/wechat-login')
+  assert.equal(capturedOptions.method, 'POST')
+  assert.deepEqual(JSON.parse(JSON.stringify(capturedOptions.data)), {
+    code: 'code-123',
+    profile
+  })
+})
+
+test('wechatLogin sends only the login code when no profile is provided', async () => {
   let capturedOptions = null
   const loaded = loadApi({
     requestImpl(options) {
@@ -147,6 +171,53 @@ test('payOrder posts to the order pay endpoint', async () => {
   assert.equal(capturedOptions.method, 'POST')
 })
 
+test('uploadAvatar uploads the chosen image file with authorization', async () => {
+  let capturedOptions = null
+  const filename = path.join(__dirname, '../utils/api.js')
+  const code = fs.readFileSync(filename, 'utf8')
+  const module = { exports: {} }
+  const sandbox = {
+    module,
+    exports: module.exports,
+    getApp() {
+      return {
+        globalData: {
+          apiBaseUrl: 'http://localhost:8080'
+        }
+      }
+    },
+    wx: {
+      getStorageSync(key) {
+        return key === 'token' ? 'token-value' : ''
+      },
+      request() {
+        throw new Error('request should not be used for avatar upload')
+      },
+      uploadFile(options) {
+        capturedOptions = options
+        options.success({
+          statusCode: 200,
+          data: JSON.stringify({
+            user: { id: 'user-1', avatarUrl: 'https://example.com/avatar.png' }
+          })
+        })
+      }
+    }
+  }
+
+  vm.runInNewContext(code, sandbox, { filename })
+
+  await module.exports.uploadAvatar('wxfile://avatar.png')
+
+  assert.ok(capturedOptions)
+  assert.equal(capturedOptions.url, 'http://localhost:8080/api/auth/avatar')
+  assert.equal(capturedOptions.filePath, 'wxfile://avatar.png')
+  assert.equal(capturedOptions.name, 'file')
+  assert.deepEqual(JSON.parse(JSON.stringify(capturedOptions.header)), {
+    Authorization: 'Bearer token-value'
+  })
+})
+
 test('mockPayOrder posts to the order mock-pay endpoint', async () => {
   let capturedOptions = null
   const loaded = loadApi({
@@ -160,4 +231,41 @@ test('mockPayOrder posts to the order mock-pay endpoint', async () => {
   assert.ok(capturedOptions)
   assert.equal(capturedOptions.url, 'http://localhost:8080/api/orders/order-1/mock-pay')
   assert.equal(capturedOptions.method, 'POST')
+})
+
+test('request upgrades the production api base url to https', async () => {
+  let capturedOptions = null
+  const loaded = loadApi({
+    apiBaseUrl: 'http://cvnert.com.cn:8080',
+    requestImpl(options) {
+      capturedOptions = options
+    }
+  })
+
+  await loaded.api.getHomeContent()
+
+  assert.ok(capturedOptions)
+  assert.equal(capturedOptions.url, 'https://cvnert.com.cn/api/home')
+})
+
+test('resolveMediaUrl prefixes relative upload paths with the normalized api base url', () => {
+  const loaded = loadApi({
+    apiBaseUrl: 'http://cvnert.com.cn:8080'
+  })
+
+  assert.equal(
+    loaded.api.resolveMediaUrl('/uploads/avatars/a.png'),
+    'https://cvnert.com.cn/uploads/avatars/a.png'
+  )
+})
+
+test('resolveMediaUrl upgrades legacy upload origins to the normalized api base url', () => {
+  const loaded = loadApi({
+    apiBaseUrl: 'http://cvnert.com.cn:8080'
+  })
+
+  assert.equal(
+    loaded.api.resolveMediaUrl('http://cvnert.com.cn:8080/uploads/avatars/a.png'),
+    'https://cvnert.com.cn/uploads/avatars/a.png'
+  )
 })

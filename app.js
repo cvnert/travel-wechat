@@ -1,5 +1,5 @@
 App({
   globalData: {
-    apiBaseUrl: 'http://cvnert.com.cn:8080'
+    apiBaseUrl: 'https://cvnert.com.cn'
   }
 })

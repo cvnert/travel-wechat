@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>订单页重设计方向</title>
+  <style>
+    :root {
+      --bg: #f4f6fb;
+      --card: #ffffff;
+      --text: #0f172a;
+      --muted: #667085;
+      --line: #e7ecf4;
+      --blue: #2563eb;
+      --navy: #172338;
+      --amber: #f59e0b;
+      --green: #10b981;
+      --shadow: 0 18px 48px rgba(15, 23, 42, 0.1);
+      --radius: 24px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
+      background:
+        radial-gradient(circle at top left, rgba(255, 213, 164, 0.35), transparent 20%),
+        linear-gradient(180deg, #fff7ec 0%, #f5f7fb 22%, #eef2f8 100%);
+      color: var(--text);
+    }
+
+    .wrap {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 32px 20px 56px;
+    }
+
+    .hero {
+      margin-bottom: 28px;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      padding: 8px 14px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.8);
+      color: #9a3412;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+    }
+
+    h1 {
+      margin: 14px 0 10px;
+      font-size: 34px;
+      line-height: 1.15;
+    }
+
+    .hero p {
+      margin: 0;
+      max-width: 760px;
+      color: var(--muted);
+      font-size: 16px;
+      line-height: 1.7;
+    }
+
+    .options {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
+      gap: 22px;
+    }
+
+    .option {
+      border-radius: 28px;
+      background: rgba(255, 255, 255, 0.76);
+      border: 1px solid rgba(255, 255, 255, 0.8);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(16px);
+      overflow: hidden;
+    }
+
+    .option-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 22px 22px 16px;
+    }
+
+    .option-title {
+      font-size: 20px;
+      font-weight: 800;
+    }
+
+    .option-tag {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 66px;
+      height: 32px;
+      padding: 0 12px;
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .tag-recommend {
+      background: #172338;
+      color: #fff;
+    }
+
+    .tag-light {
+      background: #eef2ff;
+      color: #3851b2;
+    }
+
+    .tag-brand {
+      background: #ecfeff;
+      color: #0f766e;
+    }
+
+    .option-copy {
+      padding: 0 22px 18px;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.7;
+      min-height: 72px;
+    }
+
+    .phone {
+      margin: 0 16px 16px;
+      padding: 14px;
+      border-radius: 30px;
+      background: #1f2937;
+    }
+
+    .screen {
+      border-radius: 24px;
+      overflow: hidden;
+      min-height: 610px;
+      background: var(--bg);
+      padding: 16px;
+    }
+
+    .tabs {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    .tab {
+      height: 42px;
+      border-radius: 999px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      font-weight: 700;
+      color: #7c8798;
+      background: #fff;
+    }
+
+    .tab.active-dark {
+      color: #fff;
+      background: #172338;
+    }
+
+    .tab.active-blue {
+      color: #fff;
+      background: linear-gradient(135deg, #2d7ef7 0%, #2463eb 100%);
+    }
+
+    .tab.active-warm {
+      color: #fff;
+      background: linear-gradient(135deg, #0f766e 0%, #164e63 100%);
+    }
+
+    .order-card {
+      border-radius: 22px;
+      padding: 16px;
+      background: #fff;
+      box-shadow: 0 12px 32px rgba(15, 23, 42, 0.08);
+    }
+
+    .order-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .order-no {
+      font-size: 12px;
+      color: #475467;
+    }
+
+    .status {
+      height: 30px;
+      padding: 0 12px;
+      border-radius: 999px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+
+    .status-orange {
+      color: #ea580c;
+      background: #fff7ed;
+    }
+
+    .status-blue {
+      color: #2563eb;
+      background: #eff6ff;
+    }
+
+    .status-green {
+      color: #16a34a;
+      background: #ecfdf3;
+    }
+
+    .item-box {
+      margin-top: 14px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px;
+      border-radius: 18px;
+    }
+
+    .item-box.soft {
+      background: #f8fafc;
+    }
+
+    .item-box.plain {
+      background: #fff;
+      border: 1px solid #ecf0f5;
+    }
+
+    .item-box.brand {
+      background: linear-gradient(180deg, #f7fbfc 0%, #f1f7f8 100%);
+      border: 1px solid #e4ecef;
+    }
+
+    .cover {
+      width: 64px;
+      height: 64px;
+      border-radius: 16px;
+      overflow: hidden;
+      flex: 0 0 64px;
+      background: linear-gradient(135deg, #7dd3fc 0%, #fde68a 100%);
+      position: relative;
+    }
+
+    .cover::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(180deg, rgba(0, 0, 0, 0.04), rgba(0, 0, 0, 0.28)),
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='96' height='96' viewBox='0 0 96 96'%3E%3Crect width='96' height='96' fill='%23dbeafe'/%3E%3Cpath d='M0 66L22 48L35 60L56 33L74 52L96 28V96H0Z' fill='%232563eb'/%3E%3Cpath d='M0 78L22 62L35 71L56 50L74 63L96 44V96H0Z' fill='%230f766e' fill-opacity='.82'/%3E%3C/svg%3E") center/cover no-repeat;
+    }
+
+    .item-main {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .title {
+      font-size: 17px;
+      font-weight: 800;
+      line-height: 1.35;
+    }
+
+    .meta {
+      margin-top: 6px;
+      color: #667085;
+      font-size: 13px;
+    }
+
+    .price {
+      font-size: 18px;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+
+    .foot {
+      margin-top: 14px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .summary {
+      flex: 1;
+      color: #667085;
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .cta {
+      min-width: 132px;
+      height: 44px;
+      padding: 0 18px;
+      border-radius: 14px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      font-weight: 800;
+      color: #fff;
+    }
+
+    .cta-blue {
+      background: linear-gradient(135deg, #2d7ef7 0%, #2463eb 100%);
+    }
+
+    .cta-dark {
+      background: #172338;
+    }
+
+    .cta-teal {
+      background: linear-gradient(135deg, #0f766e 0%, #164e63 100%);
+    }
+
+    .stack {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .secondary-card {
+      border-radius: 18px;
+      padding: 14px;
+      background: rgba(255, 255, 255, 0.9);
+      border: 1px solid #edf1f6;
+    }
+
+    .secondary-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: #111827;
+    }
+
+    .secondary-desc {
+      margin-top: 6px;
+      color: #667085;
+      font-size: 12px;
+      line-height: 1.6;
+    }
+
+    .pick {
+      padding: 0 22px 22px;
+      color: #111827;
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .pick span {
+      color: #2563eb;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="hero">
+      <div class="eyebrow">订单页重设计提案</div>
+      <h1>选一个更像成熟电商的方向</h1>
+      <p>我把当前订单列表卡片拆成了三个方向。重点不是花哨，而是把状态、商品、金额和支付动作的层级拉开，看起来更稳，也更像你前面提过的淘宝系感觉。</p>
+    </div>
+
+    <div class="options">
+      <section class="option">
+        <div class="option-head">
+          <div class="option-title">1. 轻卡片版</div>
+          <div class="option-tag tag-light">更轻盈</div>
+        </div>
+        <div class="option-copy">留白最多，卡片最干净。适合想要“轻一点、清爽一点”的感觉，但电商冲击力会弱一点。</div>
+        <div class="phone">
+          <div class="screen">
+            <div class="tabs">
+              <div class="tab">全部</div>
+              <div class="tab active-blue">待支付</div>
+              <div class="tab">待出行</div>
+              <div class="tab">已出行</div>
+            </div>
+            <div class="order-card">
+              <div class="order-head">
+                <div class="order-no">订单号 TR202605310201357365</div>
+                <div class="status status-orange">待支付</div>
+              </div>
+              <div class="item-box soft">
+                <div class="cover"></div>
+                <div class="item-main">
+                  <div class="title">烟台</div>
+                  <div class="meta">¥998.00 x 1</div>
+                </div>
+                <div class="price">¥998.00</div>
+              </div>
+              <div class="foot">
+                <div class="summary">共 1 件，合计 ¥998.00</div>
+                <div class="cta cta-blue">立即支付</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="pick">如果你喜欢这个，回我 <span>1</span></div>
+      </section>
+
+      <section class="option">
+        <div class="option-head">
+          <div class="option-title">2. 淘宝稳重版</div>
+          <div class="option-tag tag-recommend">推荐</div>
+        </div>
+        <div class="option-copy">更像成熟电商订单中心。状态更醒目，商品块更规整，底部支付按钮更稳，整体信息密度和节奏最好。</div>
+        <div class="phone">
+          <div class="screen">
+            <div class="tabs">
+              <div class="tab">全部</div>
+              <div class="tab active-dark">待支付</div>
+              <div class="tab">待出行</div>
+              <div class="tab">已出行</div>
+            </div>
+            <div class="order-card">
+              <div class="order-head">
+                <div class="stack" style="gap:4px">
+                  <div class="order-no">订单号 TR202605310201357365</div>
+                  <div class="meta" style="margin:0">下单时间 2026-05-31 20:13</div>
+                </div>
+                <div class="status status-orange">待支付</div>
+              </div>
+              <div class="item-box plain">
+                <div class="cover"></div>
+                <div class="item-main">
+                  <div class="title">烟台</div>
+                  <div class="meta">成人票 · 1 份</div>
+                  <div class="meta">单价 ¥998.00</div>
+                </div>
+                <div class="price">¥998.00</div>
+              </div>
+              <div class="foot">
+                <div class="summary">共 1 件<br>实付款 ¥998.00</div>
+                <div class="cta cta-blue">立即支付</div>
+              </div>
+            </div>
+            <div class="stack" style="margin-top:12px">
+              <div class="secondary-card">
+                <div class="secondary-title">支付后自动生成凭证</div>
+                <div class="secondary-desc">进入待出行后，凭证码和核销状态会直接出现在订单详情里。</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="pick">如果你喜欢这个，回我 <span>2</span></div>
+      </section>
+
+      <section class="option">
+        <div class="option-head">
+          <div class="option-title">3. 品牌感加强版</div>
+          <div class="option-tag tag-brand">更有风格</div>
+        </div>
+        <div class="option-copy">保留电商秩序感，但把旅行品牌气质提上来。更有辨识度，不过会比淘宝系更“设计化”一点。</div>
+        <div class="phone">
+          <div class="screen" style="background:linear-gradient(180deg,#f5fbfb 0%,#eef4f6 100%)">
+            <div class="tabs">
+              <div class="tab">全部</div>
+              <div class="tab active-warm">待支付</div>
+              <div class="tab">待出行</div>
+              <div class="tab">已出行</div>
+            </div>
+            <div class="order-card" style="box-shadow:0 14px 36px rgba(15, 23, 42, 0.09)">
+              <div class="order-head">
+                <div class="stack" style="gap:4px">
+                  <div class="order-no">订单号 TR202605310201357365</div>
+                  <div class="meta" style="margin:0;color:#0f766e">凭证将在支付成功后自动生成</div>
+                </div>
+                <div class="status status-blue">待支付</div>
+              </div>
+              <div class="item-box brand">
+                <div class="cover"></div>
+                <div class="item-main">
+                  <div class="title">烟台</div>
+                  <div class="meta">滨海线路 · 1 人出行</div>
+                </div>
+                <div class="price">¥998.00</div>
+              </div>
+              <div class="foot">
+                <div class="summary">共 1 件，合计 ¥998.00</div>
+                <div class="cta cta-teal">立即支付</div>
+              </div>
+            </div>
+            <div class="stack" style="margin-top:12px">
+              <div class="secondary-card" style="background:#f8fffe;border-color:#d8eeeb">
+                <div class="secondary-title">出行提醒</div>
+                <div class="secondary-desc">已支付订单会直接进入待出行，凭证码支持后台核销。</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="pick">如果你喜欢这个，回我 <span>3</span></div>
+      </section>
+    </div>
+  </div>
+</body>
+</html>
