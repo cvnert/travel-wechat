@@ -1,0 +1,6 @@
+{
+  "navigationBarTitleText": "填写出行信息",
+  "usingComponents": {
+    "van-calendar": "@vant/weapp/calendar/index"
+  }
+}

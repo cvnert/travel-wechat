@@ -19,17 +19,6 @@
         <view class="sales">已售 {{product.salesCount}}</view>
       </view>
 
-      <view class="section travel-section">
-        <view class="section-head">
-          <view class="section-title">选择出发日期</view>
-          <button class="travel-action" bindtap="openTravelDrawer">选择日期</button>
-        </view>
-        <view wx:if="{{selectedTravelDateText}}" class="travel-selected">
-          已选 {{selectedTravelDateText}} · {{selectedTravelPriceText}}
-        </view>
-        <view wx:else class="travel-selected travel-selected-muted">请选择出行日期和对应价格</view>
-      </view>
-
       <view wx:if="{{detailImages.length > 0}}" class="detail-images-section">
         <view class="section-title">产品详情</view>
         <image
@@ -61,35 +50,8 @@
     </view>
   </scroll-view>
 
-  <van-calendar
-    class="travel-calendar"
-    custom-class="travel-calendar"
-    show="{{showTravelDrawer}}"
-    title="选择出发日期"
-    position="bottom"
-    round
-    close-on-click-overlay
-    show-title="{{true}}"
-    show-confirm="{{false}}"
-    show-mark="{{false}}"
-    show-subtitle="{{true}}"
-    color="#57b75d"
-    min-date="{{calendarMinDate}}"
-    max-date="{{calendarMaxDate}}"
-    default-date="{{calendarDefaultDate}}"
-    formatter="{{calendarFormatter}}"
-    root-portal="{{true}}"
-    bind:close="closeTravelDrawer"
-    bind:select="selectTravelDate"
-    bind:confirm="selectTravelDate"
-  />
-
   <view class="bottom-bar">
     <view class="tool-group">
-      <view class="tool-item" bindtap="callService">
-        <view class="tool-icon">客</view>
-        <view class="tool-label">客服</view>
-      </view>
       <view class="tool-item" bindtap="openCart">
         <view class="tool-icon tool-icon-cart">
           <text class="tool-icon-text">车</text>

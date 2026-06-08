@@ -1,0 +1,75 @@
+<view class="booking-page">
+  <view wx:if="{{product}}" class="product-card">
+    <image class="product-cover" src="{{product.coverDisplayUrl}}" mode="aspectFill" />
+    <view class="product-info">
+      <view class="product-title">{{product.title}}</view>
+      <view class="product-desc">{{product.descText}}</view>
+      <view class="product-price">{{selectedTravelPriceText}} / 人</view>
+    </view>
+  </view>
+
+  <view class="section-card">
+    <view class="section-head">
+      <view class="section-title">出行日期</view>
+      <button class="section-action" bindtap="openTravelDrawer">选择日期</button>
+    </view>
+    <view wx:if="{{selectedTravelDateText}}" class="selected-date">
+      已选 {{selectedTravelDateText}} · {{selectedTravelPriceText}} / 人
+    </view>
+    <view wx:else class="selected-date selected-date-muted">请选择出行日期</view>
+  </view>
+
+  <view class="section-card travelers-card">
+    <view class="section-head">
+      <view>
+        <view class="section-title">出行人</view>
+        <view class="section-subtitle">请填写真实信息，核销时可能需要核对</view>
+      </view>
+      <button class="section-action" bindtap="addTraveler">添加</button>
+    </view>
+
+    <view wx:for="{{travelers}}" wx:key="title" class="traveler-form">
+      <view class="traveler-head">
+        <view class="traveler-title">{{item.title}}</view>
+        <view wx:if="{{item.showRemove}}" class="remove-link" data-index="{{index}}" bindtap="removeTraveler">删除</view>
+      </view>
+      <input class="form-input" placeholder="姓名" value="{{item.name}}" data-index="{{index}}" data-field="name" bindinput="updateTravelerField" />
+      <input class="form-input" placeholder="手机号" type="number" maxlength="11" value="{{item.phone}}" data-index="{{index}}" data-field="phone" bindinput="updateTravelerField" />
+      <view class="gender-row">
+        <view class="{{item.maleClass}}" data-index="{{index}}" data-gender="male" bindtap="selectGender">男</view>
+        <view class="{{item.femaleClass}}" data-index="{{index}}" data-gender="female" bindtap="selectGender">女</view>
+      </view>
+      <input class="form-input" placeholder="身份证号" maxlength="18" value="{{item.idCard}}" data-index="{{index}}" data-field="idCard" bindinput="updateTravelerField" />
+    </view>
+  </view>
+
+  <van-calendar
+    class="travel-calendar"
+    custom-class="travel-calendar"
+    show="{{showTravelDrawer}}"
+    title="选择出发日期"
+    position="bottom"
+    round
+    close-on-click-overlay
+    show-title="{{true}}"
+    show-confirm="{{false}}"
+    show-mark="{{false}}"
+    color="#57b75d"
+    min-date="{{calendarMinDate}}"
+    max-date="{{calendarMaxDate}}"
+    default-date="{{calendarDefaultDate}}"
+    formatter="{{calendarFormatter}}"
+    root-portal="{{true}}"
+    bind:close="closeTravelDrawer"
+    bind:select="selectTravelDate"
+    bind:confirm="selectTravelDate"
+  />
+
+  <view class="checkout-bar">
+    <view class="checkout-info">
+      <view class="checkout-label">{{travelerCount}} 人 × {{unitPriceText}}</view>
+      <view class="checkout-price">{{totalAmountText}}</view>
+    </view>
+    <button class="checkout-button" disabled="{{submitDisabled}}" loading="{{submitting}}" bindtap="submitOrder">提交并支付</button>
+  </view>
+</view>

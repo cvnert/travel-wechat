@@ -7,7 +7,7 @@ import { fileURLToPath } from 'node:url'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
-function loadPage(requireMap = {}) {
+function loadPage(requireMap = {}, wxOverrides = {}) {
   const filename = path.join(__dirname, '../pages/product-detail/index.js')
   const code = fs.readFileSync(filename, 'utf8')
   let pageConfig = null
@@ -27,7 +27,7 @@ function loadPage(requireMap = {}) {
     Page(config) {
       pageConfig = config
     },
-    wx: {}
+    wx: wxOverrides
   }
   vm.runInNewContext(code, sandbox, { filename })
   return pageConfig
@@ -46,19 +46,49 @@ test('product detail page exposes taobao-style bottom actions', () => {
   assert.equal(page.data.cartCount, 0)
   assert.equal(typeof page.openCart, 'function')
   assert.equal(typeof page.refreshCartCount, 'function')
+  assert.equal(typeof page.callService, 'undefined')
   assert.doesNotMatch(wxml, /店铺/)
+  assert.doesNotMatch(wxml, /客服/)
   assert.doesNotMatch(wxml, /bindtap="openHome"/)
+  assert.doesNotMatch(wxml, /bindtap="callService"/)
 })
 
-test('product detail page locks background scroll while the travel drawer is open', () => {
+test('product detail page keeps travel date selection on the booking page', () => {
   const wxml = fs.readFileSync(path.join(__dirname, '../pages/product-detail/index.wxml'), 'utf8')
-  const json = fs.readFileSync(path.join(__dirname, '../pages/product-detail/index.json'), 'utf8')
 
   assert.match(wxml, /<scroll-view class="detail-scroll" scroll-y="\{\{detailScrollEnabled\}\}">/)
-  assert.match(wxml, /<van-calendar/)
-  assert.match(wxml, /custom-class="travel-calendar"/)
-  assert.match(wxml, /root-portal="\{\{true\}\}"/)
-  assert.doesNotMatch(wxml, /确认/)
-  assert.doesNotMatch(wxml, /取消/)
-  assert.match(json, /van-calendar/)
+  assert.doesNotMatch(wxml, /选择出发日期/)
+  assert.doesNotMatch(wxml, /<van-calendar/)
+  assert.doesNotMatch(wxml, /bindtap="openTravelDrawer"/)
+})
+
+test('product detail buy action navigates to booking page', async () => {
+  let navigatedUrl = ''
+  const page = loadPage({
+    '../../utils/api': {
+      async addCartItem() {}
+    },
+    '../../utils/auth': { requireLogin: () => true },
+    '../../utils/format': { formatPrice: (value) => String(value) },
+    '../../utils/travel-date': { buildTravelDateCalendar: () => ({ months: [], days: [], selectedDate: '', selectedDay: null, selectedPriceText: '0' }) }
+  }, {
+    navigateTo(options) {
+      navigatedUrl = options.url
+    },
+    switchTab() {},
+    showToast() {}
+  })
+  const instance = {
+    data: {
+      product: { id: 'product-1' },
+      actionLoading: false
+    },
+    setData(update) {
+      Object.assign(this.data, update)
+    },
+    refreshCartCount: async () => {}
+  }
+  await page.reserve.call(instance)
+
+  assert.equal(navigatedUrl, '/pages/booking/index?id=product-1')
 })

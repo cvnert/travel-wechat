@@ -47,7 +47,13 @@ function normalizeOrder(order) {
       ...item,
       coverDisplayUrl: item.productCoverImageUrl || item.productCoverImage || '',
       unitPriceText: formatPrice(item.unitPrice),
-      subtotalText: formatPrice(item.subtotalAmount)
+      subtotalText: formatPrice(item.subtotalAmount),
+      travelers: (item.travelers || []).map((traveler, index) => ({
+        ...traveler,
+        title: `出行人 ${index + 1}`,
+        genderText: traveler.gender === 'female' ? '女' : '男'
+      })),
+      showTravelers: (item.travelers || []).length > 0
     }))
   }
 }

@@ -11,7 +11,8 @@
 .status-card,
 .voucher-card,
 .info-card,
-.items-card {
+.items-card,
+.travelers-info-card {
   border-radius: 28rpx;
   background: rgba(255, 255, 255, 0.96);
   box-shadow: 0 16rpx 38rpx rgba(15, 23, 42, 0.08);
@@ -78,7 +79,8 @@
 
 .voucher-card,
 .info-card,
-.items-card {
+.items-card,
+.travelers-info-card {
   margin-top: 20rpx;
   padding: 28rpx;
 }
@@ -178,6 +180,41 @@
   color: #111827;
   font-size: 26rpx;
   font-weight: 700;
+}
+
+.traveler-info {
+  margin-top: 20rpx;
+  padding: 22rpx;
+  border-radius: 20rpx;
+  background: #f8fafc;
+}
+
+.traveler-info-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18rpx;
+}
+
+.traveler-info-title {
+  color: #111827;
+  font-size: 26rpx;
+  font-weight: 800;
+}
+
+.traveler-info-gender {
+  padding: 6rpx 14rpx;
+  border-radius: 999rpx;
+  background: #ecfdf3;
+  color: #16a34a;
+  font-size: 22rpx;
+  font-weight: 700;
+}
+
+.traveler-info-row {
+  margin-top: 12rpx;
+  color: #475467;
+  font-size: 24rpx;
 }
 
 .bottom-bar {

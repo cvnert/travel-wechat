@@ -1,0 +1,211 @@
+.booking-page {
+  min-height: 100vh;
+  padding: 24rpx 24rpx 180rpx;
+  background: #f5f7fb;
+  box-sizing: border-box;
+}
+
+.product-card,
+.section-card {
+  border-radius: 24rpx;
+  background: #ffffff;
+  box-shadow: 0 10rpx 30rpx rgba(16, 24, 40, 0.06);
+}
+
+.product-card {
+  display: flex;
+  gap: 20rpx;
+  padding: 22rpx;
+}
+
+.product-cover {
+  width: 176rpx;
+  height: 176rpx;
+  flex: 0 0 176rpx;
+  border-radius: 18rpx;
+  background: #e5e7eb;
+}
+
+.product-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.product-title {
+  color: #111827;
+  font-size: 30rpx;
+  font-weight: 800;
+  line-height: 1.45;
+}
+
+.product-desc {
+  display: -webkit-box;
+  margin-top: 10rpx;
+  color: #667085;
+  font-size: 24rpx;
+  line-height: 1.5;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+.product-price {
+  margin-top: 16rpx;
+  color: #f04438;
+  font-size: 32rpx;
+  font-weight: 800;
+}
+
+.section-card {
+  margin-top: 20rpx;
+  padding: 28rpx;
+}
+
+.section-head,
+.traveler-head,
+.checkout-bar,
+.gender-row {
+  display: flex;
+  align-items: center;
+}
+
+.section-head {
+  justify-content: space-between;
+  gap: 20rpx;
+}
+
+.section-title {
+  color: #111827;
+  font-size: 30rpx;
+  font-weight: 800;
+}
+
+.section-subtitle,
+.selected-date,
+.checkout-label {
+  color: #667085;
+  font-size: 24rpx;
+}
+
+.section-subtitle {
+  margin-top: 8rpx;
+}
+
+.section-action {
+  margin: 0;
+  padding: 0 24rpx;
+  height: 58rpx;
+  border-radius: 999rpx;
+  background: #eff6ff;
+  color: #2563eb;
+  font-size: 24rpx;
+  line-height: 58rpx;
+}
+
+.section-action::after {
+  border: 0;
+}
+
+.selected-date {
+  margin-top: 16rpx;
+}
+
+.selected-date-muted {
+  color: #98a2b3;
+}
+
+.traveler-form {
+  margin-top: 24rpx;
+  padding-top: 24rpx;
+  border-top: 1rpx solid #edf0f5;
+}
+
+.traveler-head {
+  justify-content: space-between;
+}
+
+.traveler-title {
+  color: #344054;
+  font-size: 26rpx;
+  font-weight: 800;
+}
+
+.remove-link {
+  color: #ef4444;
+  font-size: 24rpx;
+}
+
+.form-input {
+  height: 82rpx;
+  margin-top: 18rpx;
+  padding: 0 22rpx;
+  border-radius: 16rpx;
+  background: #f8fafc;
+  color: #111827;
+  font-size: 28rpx;
+  box-sizing: border-box;
+}
+
+.gender-row {
+  gap: 16rpx;
+  margin-top: 18rpx;
+}
+
+.gender-option {
+  flex: 1;
+  height: 74rpx;
+  border-radius: 16rpx;
+  background: #f8fafc;
+  color: #667085;
+  font-size: 26rpx;
+  line-height: 74rpx;
+  text-align: center;
+}
+
+.gender-option-active {
+  background: #ecfdf3;
+  color: #16a34a;
+  font-weight: 800;
+}
+
+.checkout-bar {
+  position: fixed;
+  left: 24rpx;
+  right: 24rpx;
+  bottom: calc(24rpx + env(safe-area-inset-bottom));
+  justify-content: space-between;
+  gap: 20rpx;
+  padding: 20rpx;
+  border-radius: 28rpx;
+  background: rgba(255, 255, 255, 0.98);
+  box-shadow: 0 18rpx 42rpx rgba(15, 23, 42, 0.14);
+}
+
+.checkout-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.checkout-price {
+  margin-top: 8rpx;
+  color: #f04438;
+  font-size: 36rpx;
+  font-weight: 900;
+}
+
+.checkout-button {
+  flex: 0 0 244rpx;
+  height: 86rpx;
+  margin: 0;
+  border-radius: 999rpx;
+  background: linear-gradient(135deg, #7ed37f 0%, #57b75d 100%);
+  color: #ffffff;
+  font-size: 28rpx;
+  font-weight: 800;
+  line-height: 86rpx;
+}
+
+.checkout-button::after {
+  border: 0;
+}

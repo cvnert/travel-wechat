@@ -1,6 +1,3 @@
 {
-  "navigationBarTitleText": "\u4ea7\u54c1\u8be6\u60c5",
-  "usingComponents": {
-    "van-calendar": "/miniprogram_npm/@vant/weapp/calendar/index"
-  }
+  "navigationBarTitleText": "\u4ea7\u54c1\u8be6\u60c5"
 }

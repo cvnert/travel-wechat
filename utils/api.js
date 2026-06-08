@@ -257,6 +257,18 @@ function createOrder(cartItemIds, travelDate) {
   })
 }
 
+function createDirectOrder(productId, travelDate, travelers) {
+  return request({
+    url: '/api/direct-orders',
+    method: 'POST',
+    data: {
+      productId: productId,
+      travelDate: travelDate,
+      travelers: travelers || []
+    }
+  })
+}
+
 function listOrders(status, page, pageSize) {
   return request({
     url: '/api/orders',
@@ -303,6 +315,7 @@ module.exports = {
   updateCartItem: updateCartItem,
   deleteCartItem: deleteCartItem,
   createOrder: createOrder,
+  createDirectOrder: createDirectOrder,
   listOrders: listOrders,
   getOrder: getOrder,
   payOrder: payOrder,

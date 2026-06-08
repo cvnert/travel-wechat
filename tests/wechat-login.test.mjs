@@ -156,6 +156,41 @@ test('createOrder submits selected cart item ids', async () => {
   })
 })
 
+test('createDirectOrder submits product date and travelers', async () => {
+  let capturedOptions = null
+  const loaded = loadApi({
+    requestImpl(options) {
+      capturedOptions = options
+    }
+  })
+
+  const travelers = [
+    {
+      name: '张三',
+      phone: '13800138000',
+      gender: 'male',
+      idCard: '110105199001011232'
+    },
+    {
+      name: '李四',
+      phone: '13900139000',
+      gender: 'female',
+      idCard: '110105199001011224'
+    }
+  ]
+
+  await loaded.api.createDirectOrder('product-1', '2026-06-19', travelers)
+
+  assert.ok(capturedOptions)
+  assert.equal(capturedOptions.url, 'http://localhost:8080/api/direct-orders')
+  assert.equal(capturedOptions.method, 'POST')
+  assert.deepEqual(JSON.parse(JSON.stringify(capturedOptions.data)), {
+    productId: 'product-1',
+    travelDate: '2026-06-19',
+    travelers
+  })
+})
+
 test('payOrder posts to the order pay endpoint', async () => {
   let capturedOptions = null
   const loaded = loadApi({

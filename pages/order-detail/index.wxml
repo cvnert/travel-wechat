@@ -50,6 +50,21 @@
         <view class="item-subtotal">{{item.subtotalText}}</view>
       </view>
     </view>
+
+    <block wx:for="{{order.items}}" wx:key="id">
+      <view wx:if="{{item.showTravelers}}" class="travelers-info-card">
+        <view class="section-title">出行人信息</view>
+        <view wx:for="{{item.travelers}}" wx:for-item="traveler" wx:key="id" class="traveler-info">
+          <view class="traveler-info-head">
+            <view class="traveler-info-title">{{traveler.title}}</view>
+            <view class="traveler-info-gender">{{traveler.genderText}}</view>
+          </view>
+          <view class="traveler-info-row">姓名 {{traveler.name}}</view>
+          <view class="traveler-info-row">电话 {{traveler.phone}}</view>
+          <view class="traveler-info-row">身份证 {{traveler.idCard}}</view>
+        </view>
+      </view>
+    </block>
   </view>
 
   <view wx:if="{{showPendingPaymentBar}}" class="bottom-bar">
