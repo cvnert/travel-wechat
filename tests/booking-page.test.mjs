@@ -148,7 +148,7 @@ test('booking page passes date price formatter through setData', async () => {
             price: 100,
             priceCalendar: [
               { date: '2026-06-19', price: 399.5, priceType: 'holiday', holidayLabel: '端午', isSelectable: true },
-              { date: '2026-06-20', price: 299, priceType: 'weekday', isSelectable: true }
+              { date: '2026-06-20', price: 299, priceType: 'weekend', isSelectable: true }
             ]
           }
         }
@@ -168,4 +168,13 @@ test('booking page passes date price formatter through setData', async () => {
 
   assert.equal(formattedDay.bottomInfo, '¥399.50')
   assert.equal(formattedDay.topInfo, '端午')
+  assert.match(formattedDay.className, /travel-calendar-day-holiday/)
+
+  const weekendDay = page.data.calendarFormatter({
+    date: new Date('2026-06-20T00:00:00'),
+    text: 20,
+    type: ''
+  })
+
+  assert.match(weekendDay.className, /travel-calendar-day-weekend/)
 })

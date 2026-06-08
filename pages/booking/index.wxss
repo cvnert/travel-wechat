@@ -209,3 +209,25 @@
 .checkout-button::after {
   border: 0;
 }
+
+.travel-calendar-day-weekend,
+.travel-calendar-day-holiday {
+  color: #ef4444;
+  font-weight: 800;
+}
+
+.travel-calendar-day-weekend .van-calendar__bottom-info,
+.travel-calendar-day-holiday .van-calendar__bottom-info,
+.travel-calendar-day-weekend .van-calendar__top-info,
+.travel-calendar-day-holiday .van-calendar__top-info {
+  color: #ef4444;
+}
+
+.travel-calendar-day-weekend .van-calendar__selected-day,
+.travel-calendar-day-holiday .van-calendar__selected-day,
+.travel-calendar-day-weekend .van-calendar__selected-day .van-calendar__bottom-info,
+.travel-calendar-day-holiday .van-calendar__selected-day .van-calendar__bottom-info,
+.travel-calendar-day-weekend .van-calendar__selected-day .van-calendar__top-info,
+.travel-calendar-day-holiday .van-calendar__selected-day .van-calendar__top-info {
+  color: #ffffff;
+}
