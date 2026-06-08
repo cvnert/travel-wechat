@@ -62,10 +62,13 @@ function loadBookingPage({
     }
   }
   vm.runInNewContext(code, sandbox, { filename })
+  const setDataCalls = []
   return {
     data: JSON.parse(JSON.stringify(pageConfig.data)),
+    _setDataCalls: setDataCalls,
     ...pageConfig,
     setData(update) {
+      setDataCalls.push(update)
       Object.assign(this.data, update)
     }
   }
@@ -132,4 +135,37 @@ test('booking page submits direct order with all travelers and starts payment', 
     ]
   })
   assert.equal(payOrderId, 'order-1')
+})
+
+test('booking page passes date price formatter through setData', async () => {
+  const page = loadBookingPage({
+    api: {
+      async getProductDetail() {
+        return {
+          productDetail: {
+            id: 'product-1',
+            title: '测试线路',
+            price: 100,
+            priceCalendar: [
+              { date: '2026-06-19', price: 399.5, priceType: 'holiday', holidayLabel: '端午', isSelectable: true },
+              { date: '2026-06-20', price: 299, priceType: 'weekday', isSelectable: true }
+            ]
+          }
+        }
+      }
+    }
+  })
+
+  await page.onLoad({ id: 'product-1' })
+
+  assert.ok(page._setDataCalls.some((update) => typeof update.calendarFormatter === 'function'))
+
+  const formattedDay = page.data.calendarFormatter({
+    date: new Date('2026-06-19T00:00:00'),
+    text: 19,
+    type: ''
+  })
+
+  assert.equal(formattedDay.bottomInfo, '¥399.50')
+  assert.equal(formattedDay.topInfo, '端午')
 })

@@ -111,14 +111,14 @@ Page({
     if (!requireLogin('登录后可填写出行信息')) {
       return
     }
-    this.data.calendarFormatter = this.formatCalendarDay.bind(this)
+    this.refreshCalendarFormatter()
     const productId = options && options.id ? options.id : ''
     if (!productId) {
       wx.showToast({ title: '缺少产品 ID', icon: 'none' })
       return
     }
     this.setData({ productId, selectedTravelDate: options.travelDate || '' })
-    this.loadProduct(productId, options.travelDate || '')
+    return this.loadProduct(productId, options.travelDate || '')
   },
 
   setBookingState(partial) {
@@ -166,6 +166,7 @@ Page({
         selectedTravelPriceText: selectedDay ? selectedDay.priceText : formatPrice(detail.price || 0),
         loading: false
       })
+      this.refreshCalendarFormatter()
       wx.setNavigationBarTitle({ title: '填写出行信息' })
     } catch (error) {
       wx.showToast({ title: error.error || '产品加载失败', icon: 'none' })
@@ -184,13 +185,22 @@ Page({
     return {
       ...day,
       topInfo: travelDay.holidayLabel || '',
-      bottomInfo: travelDay.priceText,
+      bottomInfo: travelDay.priceText || formatPrice(travelDay.price),
       className: `travel-calendar-day travel-calendar-day-${travelDay.priceType}`
     }
   },
 
+  refreshCalendarFormatter() {
+    this.setData({
+      calendarFormatter: this.formatCalendarDay.bind(this)
+    })
+  },
+
   openTravelDrawer() {
-    this.setData({ showTravelDrawer: true })
+    this.setData({
+      showTravelDrawer: true,
+      calendarFormatter: this.formatCalendarDay.bind(this)
+    })
   },
 
   closeTravelDrawer() {
